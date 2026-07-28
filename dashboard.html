@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TC Compliance Hub — Dashboard de Compliance</title>
+  <meta name="description" content="Dashboard interno de TC Compliance Hub. Supervisión en tiempo real de brokers, casos abiertos, alertas de riesgo y reportes regulatorios." />
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    /* ============================================================
+       DESIGN SYSTEM
+    ============================================================ */
+    :root {
+      --tc-black:     #030030;
+      --tc-card:      #0A0A45;
+      --tc-card-2:    #080838;
+      --tc-green:     #13CA60;
+      --tc-green-h:   #0FA84E;
+      --tc-white:     #FFFFFF;
+      --tc-gray:      rgba(255,255,255,0.55);
+      --tc-gray-2:    rgba(255,255,255,0.35);
+      --tc-border:    rgba(255,255,255,0.10);
+      --tc-error:     #FF4D4D;
+      --tc-warn:      #F5C518;
+      --tc-blue:      #4F7FFF;
+      --sidebar-w:    240px;
+      --header-h:     64px;
+      --tc:           .18s ease;
+      --tt:           .25s ease;
+      --radius:       12px;
+      --radius-sm:    8px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--tc-black);
+      background-image: radial-gradient(circle, rgba(19,202,96,.06) 1px, transparent 1px);
+      background-size: 28px 28px;
+      color: var(--tc-white);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+    }
+
+    /* ============================================================
+       LAYOUT: SIDEBAR + MAIN
+    ============================================================ */
+    .sidebar {
+      width: var(--sidebar-w);
+      min-height: 100vh;
+      background: rgba(3, 0, 48, 0.97);
+      border-right: 1px solid var(--tc-border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      left: 0; top: 0; bottom: 0;
+      z-index: 100;
+      transition: transform var(--tt);
+    }
+
+    .main-wrap {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Sidebar: Logo ── */
+    .sidebar__logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 20px 18px;
+      border-bottom: 1px solid var(--tc-border);
+      text-decoration: none;
+    }
+    .sidebar__logo-icon {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, var(--tc-green), var(--tc-green-h));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .sidebar__logo-icon .material-icons { font-size: 18px; color: var(--tc-black); }
+    .sidebar__logo-text { display: flex; flex-direction: column; line-height: 1.15; }
+    .sidebar__logo-text strong { font-size: .8rem; font-weight: 800; color: var(--tc-white); }
+    .sidebar__logo-text span   { font-size: .55rem; color: var(--tc-green); letter-spacing: .1em; text-transform: uppercase; }
+
+    /* ── Sidebar: Nav ── */
+    .sidebar__nav {
+      flex: 1;
+      padding: 16px 10px;
+      overflow-y: auto;
+    }
+    .sidebar__section-label {
+      font-size: .6rem;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--tc-gray-2);
+      padding: 8px 10px 6px;
+      margin-top: 8px;
+    }
+    .sidebar__nav a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      font-size: .84rem;
+      font-weight: 500;
+      color: var(--tc-gray);
+      transition: color var(--tc), background var(--tc);
+      margin-bottom: 2px;
+    }
+    .sidebar__nav a .material-icons { font-size: 18px; }
+    .sidebar__nav a:hover       { color: var(--tc-white); background: rgba(255,255,255,.05); }
+    .sidebar__nav a.active      { color: var(--tc-green); background: rgba(19,202,96,.1); }
+    .sidebar__nav a .nav-badge  {
+      margin-left: auto;
+      background: var(--tc-error);
+      color: #fff;
+      font-size: .6rem;
+      font-weight: 700;
+      border-radius: 20px;
+      padding: 1px 7px;
+      min-width: 20px;
+      text-align: center;
+    }
+    .sidebar__nav a .nav-badge.warn { background: var(--tc-warn); color: var(--tc-black); }
+    .sidebar__nav a .nav-badge.green { background: var(--tc-green); color: var(--tc-black); }
+
+    /* ── Sidebar: User block ── */
+    .sidebar__user {
+      border-top: 1px solid var(--tc-border);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sidebar__avatar {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--tc-green) 0%, #0FA84E 100%);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .8rem; font-weight: 800; color: var(--tc-black);
+      flex-shrink: 0;
+    }
+    .sidebar__user-info { overflow: hidden; }
+    .sidebar__user-info strong { font-size: .8rem; font-weight: 700; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sidebar__user-info span   { font-size: .68rem; color: var(--tc-gray); }
+
+    /* ============================================================
+       HEADER DEL DASHBOARD
+    ============================================================ */
+    .dash-header {
+      height: var(--header-h);
+      background: rgba(3,0,48,.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--tc-border);
+      display: flex;
+      align-items: center;
+      padding: 0 28px;
+      gap: 20px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .dash-header__title { font-size: 1rem; font-weight: 700; }
+    .dash-header__title span { color: var(--tc-gray); font-weight: 400; font-size: .9rem; }
+    .dash-header__spacer { flex: 1; }
+    .dash-header__meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: .78rem;
+    }
+    .dash-header__date { color: var(--tc-gray); }
+    .dash-header__shift {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(19,202,96,.1);
+      border: 1px solid rgba(19,202,96,.2);
+      border-radius: 20px;
+      padding: 4px 12px;
+      color: var(--tc-green);
+      font-weight: 700;
+      font-size: .7rem;
+      letter-spacing: .08em;
+    }
+    .dash-header__shift .pulse {
+      width: 6px; height: 6px;
+      background: var(--tc-green);
+      border-radius: 50%;
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity:1; transform:scale(1); }
+      50%      { opacity:.5; transform:scale(1.35); }
+    }
+    .btn-icon {
+      width: 36px; height: 36px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--tc-border);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: background var(--tc), border-color var(--tc);
+      position: relative;
+    }
+    .btn-icon .material-icons { font-size: 18px; color: var(--tc-gray); }
+    .btn-icon:hover { background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.2); }
+    .btn-icon .notif-dot {
+      position: absolute; top: 7px; right: 7px;
+      width: 7px; height: 7px;
+      background: var(--tc-error);
+      border-radius: 50%;
+      border: 1.5px solid var(--tc-black);
+    }
+
+    /* Hamburger mobile */
+    .sidebar-toggle {
+      display: none;
+      width: 36px; height: 36px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--tc-border);
+      border-radius: var(--radius-sm);
+      align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+    .sidebar-toggle .material-icons { font-size: 20px; color: var(--tc-gray); }
+
+    /* ============================================================
+       ÁREA PRINCIPAL
+    ============================================================ */
+    .dash-content {
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* ── Título de sección ── */
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .section-head h2 {
+      font-size: .95rem; font-weight: 700;
+    }
+    .section-head .section-sub {
+      font-size: .75rem; color: var(--tc-gray);
+      margin-top: 2px;
+    }
+    .section-head .see-all {
+      font-size: .75rem; font-weight: 600;
+      color: var(--tc-green); text-decoration: none;
+      display: flex; align-items: center; gap: 4px;
+      transition: gap var(--tc);
+    }
+    .section-head .see-all:hover { gap: 7px; }
+    .section-head .see-all .material-icons { font-size: 15px; }
+
+    /* ============================================================
+       ROW 1 — KPI CARDS
+    ============================================================ */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .kpi-card {
+      background: var(--tc-card);
+      border: 1px solid var(--tc-border);
+      border-radius: var(--radius);
+      padding: 22px;
+      position: relative; overflow: hidden;
+      transition: transform var(--tt), box-shadow var(--tt);
+    }
+    .kpi-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    }
+    .kpi-card.green::before { background: linear-gradient(90deg, transparent, var(--tc-green), transparent); }
+    .kpi-card.warn::before  { background: linear-gradient(90deg, transparent, var(--tc-warn), transparent); }
+    .kpi-card.error::before { background: linear-gradient(90deg, transparent, var(--tc-error), transparent); }
+    .kpi-card.blue::before  { background: linear-gradient(90deg, transparent, var(--tc-blue), transparent); }
+    .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 10px 32px rgba(0,0,0,.3); }
+
+    /* Glow decorativo */
+    .kpi-card::after {
+      content: '';
+      position: absolute; bottom: -30px; right: -30px;
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .kpi-card.green::after { background: rgba(19,202,96,.06); }
+    .kpi-card.warn::after  { background: rgba(245,197,24,.06); }
+    .kpi-card.error::after { background: rgba(255,77,77,.06); }
+    .kpi-card.blue::after  { background: rgba(79,127,255,.06); }
+
+    .kpi-card__top {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .kpi-card__icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .kpi-card.green .kpi-card__icon { background: rgba(19,202,96,.12); }
+    .kpi-card.warn  .kpi-card__icon { background: rgba(245,197,24,.12); }
+    .kpi-card.error .kpi-card__icon { background: rgba(255,77,77,.12); }
+    .kpi-card.blue  .kpi-card__icon { background: rgba(79,127,255,.12); }
+    .kpi-card.green .kpi-card__icon .material-icons { color: var(--tc-green); font-size: 22px; }
+    .kpi-card.warn  .kpi-card__icon .material-icons { color: var(--tc-warn);  font-size: 22px; }
+    .kpi-card.error .kpi-card__icon .material-icons { color: var(--tc-error); font-size: 22px; }
+    .kpi-card.blue  .kpi-card__icon .material-icons { color: var(--tc-blue);  font-size: 22px; }
+
+    .kpi-card__trend {
+      display: flex; align-items: center; gap: 3px;
+      font-size: .7rem; font-weight: 700;
+      border-radius: 6px;
+      padding: 3px 8px;
+    }
+    .kpi-card__trend.up   { background: rgba(19,202,96,.12); color: var(--tc-green); }
+    .kpi-card__trend.down { background: rgba(255,77,77,.12);  color: var(--tc-error); }
+    .kpi-card__trend .material-icons { font-size: 13px; }
+
+    .kpi-card__value {
+      font-size: 2.2rem; font-weight: 900;
+      line-height: 1; letter-spacing: -.02em;
+      margin-bottom: 4px;
+    }
+    .kpi-card.green .kpi-card__value { color: var(--tc-green); }
+    .kpi-card.warn  .kpi-card__value { color: var(--tc-warn); }
+    .kpi-card.error .kpi-card__value { color: var(--tc-error); }
+    .kpi-card.blue  .kpi-card__value { color: var(--tc-blue); }
+
+    .kpi-card__label { font-size: .78rem; color: var(--tc-gray); font-weight: 500; }
+    .kpi-card__sub   { font-size: .7rem; color: var(--tc-gray-2); margin-top: 6px; }
+
+    /* Mini sparkline */
+    .kpi-sparkline {
+      margin-top: 14px;
+      height: 32px;
+      position: relative;
+    }
+    .kpi-sparkline canvas { width: 100% !important; height: 32px !important; }
+
+    /* ============================================================
+       ROW 2 — GRÁFICAS Chart.js
+    ============================================================ */
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1.7fr 1fr;
+      gap: 16px;
+    }
+
+    .chart-card {
+      background: var(--tc-card);
+      border: 1px solid var(--tc-border);
+      border-radius: var(--radius);
+      padding: 24px;
+      position: relative; overflow: hidden;
+    }
+    .chart-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, transparent, var(--tc-green), transparent);
+    }
+    .chart-card__header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .chart-card__header h3 { font-size: .92rem; font-weight: 700; margin-bottom: 4px; }
+    .chart-card__header p  { font-size: .73rem; color: var(--tc-gray); }
+    .chart-legend {
+      display: flex; flex-wrap: wrap; gap: 14px;
+      margin-bottom: 16px;
+    }
+    .chart-legend__item {
+      display: flex; align-items: center; gap: 6px;
+      font-size: .73rem; color: var(--tc-gray);
+    }
+    .chart-legend__dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .chart-wrap { position: relative; }
+    .chart-wrap canvas { max-height: 240px; }
+    .donut-center {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      pointer-events: none;
+    }
+    .donut-center__val { font-size: 1.6rem; font-weight: 900; color: var(--tc-green); line-height: 1; }
+    .donut-center__label { font-size: .65rem; color: var(--tc-gray); margin-top: 3px; }
+
+    /* Tabla de leyenda del donut */
+    .donut-legend {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .donut-legend__item {
+      display: flex; align-items: center; gap: 8px;
+      font-size: .76rem;
+    }
+    .donut-legend__dot {
+      width: 10px; height: 10px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .donut-legend__name { flex: 1; color: var(--tc-gray); }
+    .donut-legend__pct  { font-weight: 700; }
+
+    /* ============================================================
+       ROW 3 — TABLA DE BROKERS
+    ============================================================ */
+    .table-card {
+      background: var(--tc-card);
+      border: 1px solid var(--tc-border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .table-card__header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--tc-border);
+    }
+    .table-card__header h3  { font-size: .92rem; font-weight: 700; }
+    .table-card__header p   { font-size: .73rem; color: var(--tc-gray); margin-top: 2px; }
+    .table-filters {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .filter-btn {
+      font-size: .7rem; font-weight: 600;
+      letter-spacing: .06em; text-transform: uppercase;
+      color: var(--tc-gray);
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--tc-border);
+      border-radius: 6px;
+      padding: 5px 12px;
+      cursor: pointer;
+      transition: color var(--tc), background var(--tc), border-color var(--tc);
+    }
+    .filter-btn.active, .filter-btn:hover {
+      color: var(--tc-green);
+      background: rgba(19,202,96,.08);
+      border-color: rgba(19,202,96,.25);
+    }
+
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th {
+      font-size: .68rem; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--tc-gray-2);
+      text-align: left;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--tc-border);
+      background: rgba(255,255,255,.02);
+    }
+    .data-table th:first-child { padding-left: 24px; }
+    .data-table th:last-child  { padding-right: 24px; text-align: right; }
+
+    .data-table td {
+      padding: 14px 16px;
+      font-size: .82rem;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+      vertical-align: middle;
+    }
+    .data-table td:first-child { padding-left: 24px; }
+    .data-table td:last-child  { padding-right: 24px; text-align: right; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: rgba(255,255,255,.02); }
+
+    .broker-cell { display: flex; align-items: center; gap: 10px; }
+    .broker-avatar {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem; font-weight: 800;
+      flex-shrink: 0;
+    }
+    .broker-name  { font-weight: 600; }
+    .broker-id    { font-size: .7rem; color: var(--tc-gray); }
+
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: .68rem; font-weight: 700;
+      letter-spacing: .06em; text-transform: uppercase;
+      border-radius: 20px; padding: 4px 11px;
+    }
+    .status-pill .material-icons { font-size: 12px; }
+    .status-pill.ok    { background: rgba(19,202,96,.12); color: var(--tc-green); }
+    .status-pill.mid   { background: rgba(245,197,24,.12); color: var(--tc-warn); }
+    .status-pill.bad   { background: rgba(255,77,77,.12);  color: var(--tc-error); }
+
+    .action-btn {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: .7rem; font-weight: 600;
+      color: var(--tc-green); text-decoration: none;
+      background: rgba(19,202,96,.08);
+      border: 1px solid rgba(19,202,96,.2);
+      border-radius: 6px; padding: 5px 10px;
+      transition: background var(--tc), box-shadow var(--tc);
+      cursor: pointer;
+    }
+    .action-btn .material-icons { font-size: 13px; }
+    .action-btn:hover { background: rgba(19,202,96,.15); box-shadow: 0 2px 8px rgba(19,202,96,.2); }
+
+    /* ============================================================
+       ROW 4 — ACTIVIDAD + MAPA LATAM
+    ============================================================ */
+    .split-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    /* Feed de actividad */
+    .activity-card {
+      background: var(--tc-card);
+      border: 1px solid var(--tc-border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .activity-card__header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--tc-border);
+    }
+    .activity-card__header h3 { font-size: .9rem; font-weight: 700; }
+    .activity-feed { padding: 8px 0; }
+    .activity-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 22px;
+      border-bottom: 1px solid rgba(255,255,255,.04);
+      transition: background var(--tc);
+    }
+    .activity-item:hover   { background: rgba(255,255,255,.02); }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .activity-icon .material-icons { font-size: 15px; }
+    .activity-icon.ok    { background: rgba(19,202,96,.12); }
+    .activity-icon.ok    .material-icons { color: var(--tc-green); }
+    .activity-icon.mid   { background: rgba(245,197,24,.12); }
+    .activity-icon.mid   .material-icons { color: var(--tc-warn); }
+    .activity-icon.bad   { background: rgba(255,77,77,.12); }
+    .activity-icon.bad   .material-icons { color: var(--tc-error); }
+    .activity-icon.info  { background: rgba(79,127,255,.12); }
+    .activity-icon.info  .material-icons { color: var(--tc-blue); }
+    .activity-body { flex: 1; min-width: 0; }
+    .activity-body p   { font-size: .82rem; line-height: 1.4; }
+    .activity-body p strong { font-weight: 700; }
+    .activity-time { font-size: .7rem; color: var(--tc-gray-2); margin-top: 3px; }
+
+    /* Mapa SVG LATAM */
+    .map-card {
+      background: var(--tc-card);
+      border: 1px solid var(--tc-border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .map-card__header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--tc-border);
+    }
+    .map-card__header h3 { font-size: .9rem; font-weight: 700; }
+    .map-content { padding: 16px 22px; }
+    .map-svg-wrap {
+      display: flex; justify-content: center;
+      margin-bottom: 16px;
+    }
+    .map-svg-wrap svg { max-width: 100%; height: auto; }
+
+    /* Puntos de calor en el mapa */
+    .heat-dot {
+      animation: heatPulse 2.5s ease-in-out infinite;
+    }
+    @keyframes heatPulse {
+      0%,100% { opacity: 1; }
+      50%      { opacity: .5; }
+    }
+
+    /* Leyenda del mapa */
+    .map-legend {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .map-legend-item {
+      display: flex; align-items: center; gap: 7px;
+      font-size: .75rem;
+    }
+    .map-legend-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+    }
+    .map-legend-country { color: var(--tc-gray); flex: 1; }
+    .map-legend-count   { font-weight: 700; }
+
+    /* ============================================================
+       ROW 5 — ALERTAS ACTIVAS
+    ============================================================ */
+    .alerts-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .alert-card {
+      background: var(--tc-card);
+      border-radius: var(--radius);
+      padding: 20px;
+      position: relative; overflow: hidden;
+      transition: transform var(--tt), box-shadow var(--tt);
+    }
+    .alert-card:hover { transform: translateY(-3px); }
+    .alert-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; bottom: 0;
+      width: 4px;
+    }
+    .alert-card.high   { border: 1px solid rgba(255,77,77,.3);  }
+    .alert-card.medium { border: 1px solid rgba(245,197,24,.3); }
+    .alert-card.low    { border: 1px solid rgba(79,127,255,.3); }
+    .alert-card.high::before   { background: var(--tc-error); }
+    .alert-card.medium::before { background: var(--tc-warn); }
+    .alert-card.low::before    { background: var(--tc-blue); }
+
+    .alert-card__top {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .alert-severity {
+      font-size: .62rem; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      border-radius: 20px; padding: 3px 10px;
+    }
+    .alert-card.high   .alert-severity { background: rgba(255,77,77,.15);  color: var(--tc-error); }
+    .alert-card.medium .alert-severity { background: rgba(245,197,24,.15); color: var(--tc-warn); }
+    .alert-card.low    .alert-severity { background: rgba(79,127,255,.15); color: var(--tc-blue); }
+
+    .alert-card__icon .material-icons { font-size: 20px; }
+    .alert-card.high   .alert-card__icon .material-icons { color: var(--tc-error); }
+    .alert-card.medium .alert-card__icon .material-icons { color: var(--tc-warn); }
+    .alert-card.low    .alert-card__icon .material-icons { color: var(--tc-blue); }
+
+    .alert-card h4 { font-size: .85rem; font-weight: 700; margin-bottom: 6px; }
+    .alert-card p  { font-size: .77rem; color: var(--tc-gray); line-height: 1.5; margin-bottom: 14px; }
+    .alert-card__footer {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .alert-time { font-size: .68rem; color: var(--tc-gray-2); }
+    .alert-action {
+      font-size: .7rem; font-weight: 600;
+      color: var(--tc-green); text-decoration: none;
+      display: flex; align-items: center; gap: 3px;
+      cursor: pointer;
+    }
+    .alert-action .material-icons { font-size: 13px; }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 1200px) {
+      .kpi-grid    { grid-template-columns: repeat(2, 1fr); }
+      .alerts-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 900px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.mobile-open {
+        transform: translateX(0);
+      }
+      .main-wrap {
+        margin-left: 0;
+      }
+      .sidebar-toggle {
+        display: flex;
+      }
+      .charts-row { grid-template-columns: 1fr; }
+      .split-row  { grid-template-columns: 1fr; }
+      .table-filters { display: none; }
+    }
+
+    @media (max-width: 600px) {
+      .kpi-grid    { grid-template-columns: 1fr; }
+      .alerts-grid { grid-template-columns: 1fr; }
+      .dash-content { padding: 16px; }
+      .dash-header  { padding: 0 16px; }
+      .dash-header__date { display: none; }
+    }
+
+    /* ── Overlay para sidebar móvil ── */
+    .sidebar-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.6);
+      z-index: 99;
+      backdrop-filter: blur(3px);
+    }
+    .sidebar-overlay.active { display: block; }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       SIDEBAR
+  ============================================================ -->
+  <aside class="sidebar" id="sidebar" role="navigation" aria-label="Navegación del dashboard">
+
+    <!-- Logo -->
+    <a href="index.html" class="sidebar__logo">
+        <img src="logo_tradingcentral.png" alt="Trading Central Logo" style="height:32px; width:auto; object-fit:contain; border-radius:4px;">
+        <div class="sidebar__logo-text"><strong>Trading Central</strong><span>central regulatoria</span></div>
+      </a>
+
+    <!-- Nav -->
+    <nav class="sidebar__nav">
+      <p class="sidebar__section-label">Principal</p>
+      <a href="dashboard.html" class="active" id="nav-overview">
+        <span class="material-icons">dashboard</span>
+        Overview
+      </a>
+      <a href="broker-audit.html" id="nav-brokers">
+        <span class="material-icons">verified_user</span>
+        Brokers
+        <span class="nav-badge green">847</span>
+      </a>
+      <a href="investor-cases.html" id="nav-cases">
+        <span class="material-icons">support_agent</span>
+        Casos
+        <span class="nav-badge">23</span>
+      </a>
+      <a href="#alertas" id="nav-alerts">
+        <span class="material-icons">notifications_active</span>
+        Alertas
+        <span class="nav-badge">4</span>
+      </a>
+      <a href="#reportes" id="nav-reports">
+        <span class="material-icons">assessment</span>
+        Reportes
+      </a>
+
+      <p class="sidebar__section-label" style="margin-top:16px;">Regulatorio</p>
+      <a href="framework.html" id="nav-framework">
+        <span class="material-icons">account_balance</span>
+        Marco Regulatorio
+      </a>
+      <a href="regulaciones.html" id="nav-regs">
+        <span class="material-icons">public</span>
+        Estándares
+      </a>
+      <a href="proceso.html" id="nav-process">
+        <span class="material-icons">timeline</span>
+        Proceso
+      </a>
+
+      <p class="sidebar__section-label" style="margin-top:16px;">Sistema</p>
+      <a href="contacto.html" id="nav-contact">
+        <span class="material-icons">mail_outline</span>
+        Contacto
+      </a>
+      <a href="index.html" id="nav-site">
+        <span class="material-icons">open_in_new</span>
+        Ver sitio público
+      </a>
+    </nav>
+
+    <!-- User block -->
+    <div class="sidebar__user">
+      <div class="sidebar__avatar">CO</div>
+      <div class="sidebar__user-info">
+        <strong>C. Officer</strong>
+        <span>Compliance Officer · TC</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Overlay mobile -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- ============================================================
+       ÁREA PRINCIPAL
+  ============================================================ -->
+  <div class="main-wrap">
+
+    <!-- Header del dashboard -->
+    <header class="dash-header" role="banner">
+      <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Abrir sidebar">
+        <span class="material-icons">menu</span>
+      </button>
+
+      <div>
+        <div class="dash-header__title">
+          TC Compliance Hub — <span>Dashboard</span>
+        </div>
+      </div>
+
+      <div class="dash-header__spacer"></div>
+
+      <div class="dash-header__meta">
+        <span class="dash-header__date" id="dash-date">Cargando…</span>
+        <span class="dash-header__shift">
+          <span class="pulse" aria-hidden="true"></span>
+          Turno 24/5 Activo
+        </span>
+        <div class="btn-icon" role="button" aria-label="Buscar">
+          <span class="material-icons">search</span>
+        </div>
+        <div class="btn-icon" role="button" aria-label="Notificaciones">
+          <span class="material-icons">notifications_none</span>
+          <span class="notif-dot" aria-label="4 notificaciones nuevas"></span>
+        </div>
+        <div class="btn-icon" role="button" aria-label="Configuración">
+          <span class="material-icons">settings</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Contenido -->
+    <main class="dash-content" role="main">
+
+      <!-- ======================================================
+           ROW 1 — KPI CARDS
+      ====================================================== -->
+      <section aria-labelledby="kpi-title">
+        <div class="section-head">
+          <div>
+            <h2 id="kpi-title">Resumen Operativo</h2>
+            <p class="section-sub">Últimos 30 días · Actualizado hace 4 min</p>
+          </div>
+          <a href="#reportes" class="see-all">
+            Ver reportes completos <span class="material-icons">arrow_forward</span>
+          </a>
+        </div>
+
+        <div class="kpi-grid">
+
+          <div class="kpi-card green" role="article" aria-label="Brokers bajo supervisión">
+            <div class="kpi-card__top">
+              <div class="kpi-card__icon">
+                <span class="material-icons">verified_user</span>
+              </div>
+              <span class="kpi-card__trend up">
+                <span class="material-icons">trending_up</span> +12
+              </span>
+            </div>
+            <div class="kpi-card__value" id="kpi-brokers">847</div>
+            <div class="kpi-card__label">Brokers bajo supervisión</div>
+            <div class="kpi-card__sub">32 países · Cobertura global</div>
+            <div class="kpi-sparkline"><canvas id="spark-brokers"></canvas></div>
+          </div>
+
+          <div class="kpi-card warn" role="article" aria-label="Casos abiertos">
+            <div class="kpi-card__top">
+              <div class="kpi-card__icon">
+                <span class="material-icons">pending_actions</span>
+              </div>
+              <span class="kpi-card__trend down">
+                <span class="material-icons">trending_down</span> −5
+              </span>
+            </div>
+            <div class="kpi-card__value" id="kpi-open">23</div>
+            <div class="kpi-card__label">Casos abiertos (30d)</div>
+            <div class="kpi-card__sub">4 requieren acción inmediata</div>
+            <div class="kpi-sparkline"><canvas id="spark-open"></canvas></div>
+          </div>
+
+          <div class="kpi-card green" role="article" aria-label="Casos resueltos">
+            <div class="kpi-card__top">
+              <div class="kpi-card__icon">
+                <span class="material-icons">task_alt</span>
+              </div>
+              <span class="kpi-card__trend up">
+                <span class="material-icons">trending_up</span> +8%
+              </span>
+            </div>
+            <div class="kpi-card__value" id="kpi-resolved">118</div>
+            <div class="kpi-card__label">Casos resueltos (30d)</div>
+            <div class="kpi-card__sub">Tasa de resolución: 83.7%</div>
+            <div class="kpi-sparkline"><canvas id="spark-resolved"></canvas></div>
+          </div>
+
+          <div class="kpi-card error" role="article" aria-label="Alertas de riesgo activas">
+            <div class="kpi-card__top">
+              <div class="kpi-card__icon">
+                <span class="material-icons">notifications_active</span>
+              </div>
+              <span class="kpi-card__trend down">
+                <span class="material-icons">trending_up</span> +2
+              </span>
+            </div>
+            <div class="kpi-card__value" id="kpi-alerts">4</div>
+            <div class="kpi-card__label">Alertas de riesgo activas</div>
+            <div class="kpi-card__sub">1 alta · 2 media · 1 baja</div>
+            <div class="kpi-sparkline"><canvas id="spark-alerts"></canvas></div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ======================================================
+           ROW 2 — GRÁFICAS Chart.js
+      ====================================================== -->
+      <section class="charts-row" aria-label="Gráficas de compliance">
+
+        <!-- Línea: casos por mes -->
+        <div class="chart-card">
+          <div class="chart-card__header">
+            <div>
+              <h3>Casos Reportados por Mes</h3>
+              <p>Últimos 12 meses · Track A + Track B</p>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="filter-btn active" onclick="setChartPeriod('12m',this)">12M</button>
+              <button class="filter-btn" onclick="setChartPeriod('6m',this)">6M</button>
+              <button class="filter-btn" onclick="setChartPeriod('3m',this)">3M</button>
+            </div>
+          </div>
+          <div class="chart-legend">
+            <div class="chart-legend__item">
+              <div class="chart-legend__dot" style="background:#13CA60;"></div>
+              Casos resueltos
+            </div>
+            <div class="chart-legend__item">
+              <div class="chart-legend__dot" style="background:#F5C518;"></div>
+              Casos abiertos
+            </div>
+            <div class="chart-legend__item">
+              <div class="chart-legend__dot" style="background:#FF4D4D;"></div>
+              Alertas
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="chart-line" aria-label="Gráfica de línea: casos reportados por mes"></canvas>
+          </div>
+        </div>
+
+        <!-- Donut: distribución por tipo -->
+        <div class="chart-card">
+          <div class="chart-card__header">
+            <div>
+              <h3>Distribución por Irregularidad</h3>
+              <p>Acumulado últimos 12 meses</p>
+            </div>
+          </div>
+          <div class="chart-wrap" style="position:relative; max-width:220px; margin:0 auto;">
+            <canvas id="chart-donut" aria-label="Gráfica donut: distribución por tipo de irregularidad"></canvas>
+            <div class="donut-center">
+              <div class="donut-center__val">141</div>
+              <div class="donut-center__label">Casos totales</div>
+            </div>
+          </div>
+          <div class="donut-legend">
+            <div class="donut-legend__item">
+              <div class="donut-legend__dot" style="background:#13CA60;"></div>
+              <span class="donut-legend__name">Fondos retenidos</span>
+              <span class="donut-legend__pct" style="color:#13CA60;">34%</span>
+            </div>
+            <div class="donut-legend__item">
+              <div class="donut-legend__dot" style="background:#F5C518;"></div>
+              <span class="donut-legend__name">Ops. no autorizadas</span>
+              <span class="donut-legend__pct" style="color:#F5C518;">26%</span>
+            </div>
+            <div class="donut-legend__item">
+              <div class="donut-legend__dot" style="background:#FF4D4D;"></div>
+              <span class="donut-legend__name">Sin licencia válida</span>
+              <span class="donut-legend__pct" style="color:#FF4D4D;">18%</span>
+            </div>
+            <div class="donut-legend__item">
+              <div class="donut-legend__dot" style="background:#4F7FFF;"></div>
+              <span class="donut-legend__name">Comisiones irregulares</span>
+              <span class="donut-legend__pct" style="color:#4F7FFF;">13%</span>
+            </div>
+            <div class="donut-legend__item">
+              <div class="donut-legend__dot" style="background:#9B59B6;"></div>
+              <span class="donut-legend__name">Plataforma manipulada</span>
+              <span class="donut-legend__pct" style="color:#9B59B6;">9%</span>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ======================================================
+           ROW 3 — TABLA DE BROKERS
+      ====================================================== -->
+      <section aria-labelledby="table-title">
+        <div class="table-card">
+          <div class="table-card__header">
+            <div>
+              <h3 id="table-title">Top Brokers por Actividad</h3>
+              <p>Últimos 30 días · 847 brokers en supervisión</p>
+            </div>
+            <div class="table-filters">
+              <button class="filter-btn active" onclick="filterTable('all',this)">Todos</button>
+              <button class="filter-btn" onclick="filterTable('ok',this)">Validados</button>
+              <button class="filter-btn" onclick="filterTable('mid',this)">En revisión</button>
+              <button class="filter-btn" onclick="filterTable('bad',this)">Alerta</button>
+            </div>
+          </div>
+
+          <table class="data-table" role="table" aria-label="Tabla de brokers por actividad">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Broker</th>
+                <th>País</th>
+                <th>Licencia</th>
+                <th>Estatus</th>
+                <th>Última revisión</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody id="broker-table-body">
+              <!-- Generada por JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ======================================================
+           ROW 4 — ACTIVIDAD + MAPA LATAM
+      ====================================================== -->
+      <div class="split-row">
+
+        <!-- Feed de actividad -->
+        <section class="activity-card" aria-labelledby="activity-title">
+          <div class="activity-card__header">
+            <h3 id="activity-title">Actividad Reciente</h3>
+            <a href="#" class="see-all">
+              Ver todo <span class="material-icons">arrow_forward</span>
+            </a>
+          </div>
+          <div class="activity-feed" id="activity-feed" role="feed" aria-label="Últimas 8 acciones del sistema">
+            <!-- Generada por JS -->
+          </div>
+        </section>
+
+        <!-- Mapa LATAM -->
+        <section class="map-card" aria-labelledby="map-title">
+          <div class="map-card__header">
+            <h3 id="map-title">Casos por País — LATAM</h3>
+            <span class="dash-header__shift" style="font-size:.65rem; padding:3px 10px;">
+              <span class="pulse" style="width:5px;height:5px;" aria-hidden="true"></span> En vivo
+            </span>
+          </div>
+          <div class="map-content">
+            <!-- SVG simplificado de LATAM con puntos de calor -->
+            <div class="map-svg-wrap">
+              <svg viewBox="0 0 300 460" width="260" height="400" aria-hidden="true" focusable="false">
+                <defs>
+                  <radialGradient id="heatGreen" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#13CA60" stop-opacity=".8"/>
+                    <stop offset="100%" stop-color="#13CA60" stop-opacity="0"/>
+                  </radialGradient>
+                  <radialGradient id="heatYellow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#F5C518" stop-opacity=".8"/>
+                    <stop offset="100%" stop-color="#F5C518" stop-opacity="0"/>
+                  </radialGradient>
+                  <radialGradient id="heatRed" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#FF4D4D" stop-opacity=".8"/>
+                    <stop offset="100%" stop-color="#FF4D4D" stop-opacity="0"/>
+                  </radialGradient>
+                </defs>
+
+                <!-- Fondo del mapa -->
+                <rect width="300" height="460" fill="rgba(10,10,69,0)" rx="8"/>
+
+                <!-- Siluetas de países LATAM (simplificadas) -->
+                <!-- México -->
+                <path d="M40,30 L130,25 L145,55 L120,80 L100,95 L60,85 L30,70 Z"
+                      fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+                <!-- Guatemala / Centroamérica -->
+                <path d="M110,100 L140,95 L155,115 L130,130 L105,120 Z"
+                      fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+                <!-- Colombia -->
+                <path d="M100,145 L145,135 L160,170 L145,200 L105,195 L90,170 Z"
+                      fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+                <!-- Venezuela -->
+                <path d="M150,140 L200,135 L210,160 L175,175 L148,168 Z"
+                      fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+                <!-- Perú -->
+                <path d="M90,200 L145,195 L150,255 L110,270 L80,245 Z"
+                      fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+                <!-- Brasil -->
+                <path d="M148,155 L230,140 L270,180 L275,250 L240,290 L190,300 L155,275 L145,220 Z"
+                      fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+                <!-- Bolivia -->
+                <path d="M145,260 L190,255 L195,295 L160,310 L138,290 Z"
+                      fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+                <!-- Chile -->
+                <path d="M100,270 L140,265 L150,310 L145,370 L100,375 L90,330 Z"
+                      fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+                <!-- Argentina -->
+                <path d="M140,310 L195,300 L200,355 L175,400 L140,410 L115,380 L110,335 Z"
+                      fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+
+                <!-- Puntos de calor (con animación) -->
+                <!-- México - Alto -->
+                <circle cx="88" cy="60" r="28" fill="url(#heatRed)" class="heat-dot" style="animation-delay:0s;"/>
+                <circle cx="88" cy="60" r="7" fill="#FF4D4D" opacity="0.9"/>
+                <text x="88" y="63" text-anchor="middle" fill="white" font-size="7" font-weight="700" font-family="Inter">MX</text>
+
+                <!-- Brasil - Alto -->
+                <circle cx="210" cy="220" r="32" fill="url(#heatRed)" class="heat-dot" style="animation-delay:.4s;"/>
+                <circle cx="210" cy="220" r="8" fill="#FF4D4D" opacity="0.9"/>
+                <text x="210" y="223" text-anchor="middle" fill="white" font-size="7" font-weight="700" font-family="Inter">BR</text>
+
+                <!-- Argentina - Medio -->
+                <circle cx="158" cy="355" r="24" fill="url(#heatYellow)" class="heat-dot" style="animation-delay:.8s;"/>
+                <circle cx="158" cy="355" r="6" fill="#F5C518" opacity="0.9"/>
+                <text x="158" y="358" text-anchor="middle" fill="white" font-size="7" font-weight="700" font-family="Inter">AR</text>
+
+                <!-- Colombia - Medio -->
+                <circle cx="122" cy="170" r="20" fill="url(#heatYellow)" class="heat-dot" style="animation-delay:1.2s;"/>
+                <circle cx="122" cy="170" r="5" fill="#F5C518" opacity="0.9"/>
+                <text x="122" y="173" text-anchor="middle" fill="white" font-size="6" font-weight="700" font-family="Inter">CO</text>
+
+                <!-- Chile - Bajo -->
+                <circle cx="120" cy="320" r="18" fill="url(#heatGreen)" class="heat-dot" style="animation-delay:1.6s;"/>
+                <circle cx="120" cy="320" r="5" fill="#13CA60" opacity="0.9"/>
+                <text x="120" y="323" text-anchor="middle" fill="white" font-size="6" font-weight="700" font-family="Inter">CL</text>
+
+                <!-- Perú - Bajo -->
+                <circle cx="118" cy="235" r="16" fill="url(#heatGreen)" class="heat-dot" style="animation-delay:2s;"/>
+                <circle cx="118" cy="235" r="5" fill="#13CA60" opacity="0.9"/>
+                <text x="118" y="238" text-anchor="middle" fill="white" font-size="6" font-weight="700" font-family="Inter">PE</text>
+              </svg>
+            </div>
+
+            <!-- Leyenda -->
+            <div class="map-legend">
+              <div class="map-legend-item">
+                <div class="map-legend-dot" style="background:#FF4D4D;"></div>
+                <span class="map-legend-country">México</span>
+                <span class="map-legend-count" style="color:#FF4D4D;">34 casos</span>
+              </div>
+              <div class="map-legend-item">
+                <div class="map-legend-dot" style="background:#FF4D4D;"></div>
+                <span class="map-legend-country">Brasil</span>
+                <span class="map-legend-count" style="color:#FF4D4D;">28 casos</span>
+              </div>
+              <div class="map-legend-item">
+                <div class="map-legend-dot" style="background:#F5C518;"></div>
+                <span class="map-legend-country">Argentina</span>
+                <span class="map-legend-count" style="color:#F5C518;">19 casos</span>
+              </div>
+              <div class="map-legend-item">
+                <div class="map-legend-dot" style="background:#F5C518;"></div>
+                <span class="map-legend-country">Colombia</span>
+                <span class="map-legend-count" style="color:#F5C518;">14 casos</span>
+              </div>
+              <div class="map-legend-item">
+                <div class="map-legend-dot" style="background:#13CA60;"></div>
+                <span class="map-legend-country">Chile</span>
+                <span class="map-legend-count" style="color:#13CA60;">11 casos</span>
+              </div>
+              <div class="map-legend-item">
+                <div class="map-legend-dot" style="background:#13CA60;"></div>
+                <span class="map-legend-country">Perú</span>
+                <span class="map-legend-count" style="color:#13CA60;">8 casos</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ======================================================
+           ROW 5 — ALERTAS ACTIVAS
+      ====================================================== -->
+      <section id="alertas" aria-labelledby="alerts-title">
+        <div class="section-head">
+          <div>
+            <h2 id="alerts-title">Alertas Activas</h2>
+            <p class="section-sub">4 alertas requieren atención · 1 crítica</p>
+          </div>
+        </div>
+
+        <div class="alerts-grid">
+
+          <div class="alert-card high" role="article" aria-label="Alerta de alta severidad">
+            <div class="alert-card__top">
+              <span class="alert-severity">Alta</span>
+              <div class="alert-card__icon">
+                <span class="material-icons">warning_amber</span>
+              </div>
+            </div>
+            <h4>Broker sin licencia activa detectado</h4>
+            <p>Nova FX LATAM perdió su licencia CNBV el 18/07. Acceso a analytics TC suspendido preventivamente.</p>
+            <div class="alert-card__footer">
+              <span class="alert-time">Hace 2 horas</span>
+              <a href="investor-cases.html" class="alert-action">
+                Revisar <span class="material-icons">open_in_new</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="alert-card medium" role="article" aria-label="Alerta de media severidad">
+            <div class="alert-card__top">
+              <span class="alert-severity">Media</span>
+              <div class="alert-card__icon">
+                <span class="material-icons">account_balance_wallet</span>
+              </div>
+            </div>
+            <h4>Posible irregularidad en retiro</h4>
+            <p>3 inversores reportaron retiros bloqueados >72h en EuroTrade Partners. Caso en investigación.</p>
+            <div class="alert-card__footer">
+              <span class="alert-time">Hace 5 horas</span>
+              <a href="investor-cases.html" class="alert-action">
+                Revisar <span class="material-icons">open_in_new</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="alert-card medium" role="article" aria-label="Segunda alerta de media severidad">
+            <div class="alert-card__top">
+              <span class="alert-severity">Media</span>
+              <div class="alert-card__icon">
+                <span class="material-icons">document_scanner</span>
+              </div>
+            </div>
+            <h4>Documentación vencida — Pacific Inv.</h4>
+            <p>Los estados financieros de Pacific Investments Ltd. vencieron el 01/07. Auditoría pausada.</p>
+            <div class="alert-card__footer">
+              <span class="alert-time">Hace 1 día</span>
+              <a href="broker-audit.html" class="alert-action">
+                Revisar <span class="material-icons">open_in_new</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="alert-card low" role="article" aria-label="Alerta de baja severidad">
+            <div class="alert-card__top">
+              <span class="alert-severity">Baja</span>
+              <div class="alert-card__icon">
+                <span class="material-icons">update</span>
+              </div>
+            </div>
+            <h4>Revisión anual pendiente — 8 brokers</h4>
+            <p>8 brokers con revisión anual programada para los próximos 15 días. Notificaciones enviadas.</p>
+            <div class="alert-card__footer">
+              <span class="alert-time">Hace 2 días</span>
+              <a href="broker-audit.html" class="alert-action">
+                Ver lista <span class="material-icons">open_in_new</span>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div><!-- /main-wrap -->
+
+
+  <!-- ============================================================
+       JAVASCRIPT — Mock data + Chart.js + interacciones
+  ============================================================ -->
+  <script>
+  /* ── Fecha en el header ── */
+  (function() {
+    const el = document.getElementById('dash-date');
+    const now = new Date();
+    const opts = { weekday:'short', year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' };
+    el.textContent = now.toLocaleDateString('es-MX', opts);
+  })();
+
+  /* ── Sidebar toggle mobile ── */
+  (function() {
+    const toggle  = document.getElementById('sidebar-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+
+    function openSidebar() {
+      sidebar.classList.add('mobile-open');
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeSidebar() {
+      sidebar.classList.remove('mobile-open');
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    toggle.addEventListener('click', openSidebar);
+    overlay.addEventListener('click', closeSidebar);
+  })();
+
+  /* ── Helpers de Chart.js ── */
+  const TC_GREEN  = '#13CA60';
+  const TC_WARN   = '#F5C518';
+  const TC_ERROR  = '#FF4D4D';
+  const TC_BLUE   = '#4F7FFF';
+  const TC_PURPLE = '#9B59B6';
+  const TC_GRAY   = 'rgba(255,255,255,0.35)';
+
+  Chart.defaults.color = TC_GRAY;
+  Chart.defaults.font.family = 'Inter';
+  Chart.defaults.font.size   = 11;
+
+  /* ── SPARKLINES (mini gráficas en KPI cards) ── */
+  function drawSparkline(id, data, color) {
+    const ctx = document.getElementById(id);
+    if (!ctx) return;
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: data.map((_,i) => i),
+        datasets: [{ data, borderColor: color, borderWidth: 2,
+          tension: .4, fill: true,
+          backgroundColor: color.replace(')', ', 0.1)').replace('rgb', 'rgba'),
+          pointRadius: 0 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        animation: { duration: 1200 },
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        scales: { x: { display: false }, y: { display: false } }
+      }
+    });
+  }
+
+  drawSparkline('spark-brokers',  [780,790,800,808,815,820,825,830,835,840,845,847], TC_GREEN);
+  drawSparkline('spark-open',     [32,30,28,35,30,27,25,28,24,26,23,23],             TC_WARN);
+  drawSparkline('spark-resolved', [95,98,100,105,102,108,110,112,110,115,117,118],   TC_GREEN);
+  drawSparkline('spark-alerts',   [2,1,3,2,4,3,2,3,4,3,4,4],                        TC_ERROR);
+
+  /* ── GRÁFICA DE LÍNEA: casos por mes ── */
+  const months12 = ['Ago', 'Sep', 'Oct', 'Nov', 'Dic', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul'];
+  const months6  = ['Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul'];
+  const months3  = ['May', 'Jun', 'Jul'];
+
+  const resolvedData = [88,92,98,105,102,110,108,112,115,110,117,118];
+  const openData     = [32,30,28,35,30,27,25,28,24,26,23,23];
+  const alertsData   = [2,1,3,2,4,3,2,3,4,3,4,4];
+
+  const lineChart = new Chart(document.getElementById('chart-line'), {
+    type: 'line',
+    data: {
+      labels: months12,
+      datasets: [
+        {
+          label: 'Casos resueltos',
+          data: resolvedData,
+          borderColor: TC_GREEN,
+          backgroundColor: 'rgba(19,202,96,0.08)',
+          borderWidth: 2.5,
+          tension: .4,
+          fill: true,
+          pointBackgroundColor: TC_GREEN,
+          pointRadius: 4,
+          pointHoverRadius: 7
+        },
+        {
+          label: 'Casos abiertos',
+          data: openData,
+          borderColor: TC_WARN,
+          backgroundColor: 'rgba(245,197,24,0.05)',
+          borderWidth: 2,
+          tension: .4,
+          fill: false,
+          pointBackgroundColor: TC_WARN,
+          pointRadius: 4,
+          pointHoverRadius: 7
+        },
+        {
+          label: 'Alertas',
+          data: alertsData,
+          borderColor: TC_ERROR,
+          backgroundColor: 'rgba(255,77,77,0.05)',
+          borderWidth: 2,
+          tension: .4,
+          fill: false,
+          pointBackgroundColor: TC_ERROR,
+          pointRadius: 4,
+          pointHoverRadius: 7
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 1000 },
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#0A0A45',
+          borderColor: 'rgba(255,255,255,0.12)',
+          borderWidth: 1,
+          padding: 12,
+          titleFont: { weight: '700', size: 12 },
+          bodyFont: { size: 11 }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          ticks: { color: TC_GRAY }
+        },
+        y: {
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          ticks: { color: TC_GRAY, stepSize: 20 },
+          beginAtZero: true
+        }
+      }
+    }
+  });
+
+  /* Cambiar período de la gráfica de línea */
+  function setChartPeriod(period, btn) {
+    document.querySelectorAll('.chart-card .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    let labels, sliceFrom;
+    if (period === '3m') { labels = months3;  sliceFrom = -3; }
+    if (period === '6m') { labels = months6;  sliceFrom = -6; }
+    if (period === '12m'){ labels = months12; sliceFrom = -12; }
+
+    lineChart.data.labels         = labels;
+    lineChart.data.datasets[0].data = resolvedData.slice(sliceFrom);
+    lineChart.data.datasets[1].data = openData.slice(sliceFrom);
+    lineChart.data.datasets[2].data = alertsData.slice(sliceFrom);
+    lineChart.update('active');
+  }
+
+  /* ── GRÁFICA DONUT ── */
+  new Chart(document.getElementById('chart-donut'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Fondos retenidos','Ops. no autorizadas','Sin licencia válida','Comisiones irregulares','Plataforma manipulada'],
+      datasets: [{
+        data: [48, 37, 25, 18, 13],
+        backgroundColor: [TC_GREEN, TC_WARN, TC_ERROR, TC_BLUE, TC_PURPLE],
+        borderWidth: 0,
+        hoverOffset: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      cutout: '70%',
+      animation: { duration: 1200 },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#0A0A45',
+          borderColor: 'rgba(255,255,255,0.12)',
+          borderWidth: 1,
+          padding: 12,
+          callbacks: {
+            label: ctx => ` ${ctx.label}: ${ctx.raw} casos`
+          }
+        }
+      }
+    }
+  });
+
+  /* ── TABLA DE BROKERS — datos mock ── */
+  const brokerData = [
+    { n:1,  name:'Alpha Markets Ltd.',     country:'Reino Unido', flag:'🇬🇧', license:'FCA #734821', status:'ok',  review:'10 Jul 2026', initials:'AM', color:'#13CA60' },
+    { n:2,  name:'EuroTrade Partners',     country:'Chipre',      flag:'🇨🇾', license:'CySEC #291/15', status:'mid', review:'08 Jul 2026', initials:'EP', color:'#4F7FFF' },
+    { n:3,  name:'Meridian Capital FX',    country:'Australia',   flag:'🇦🇺', license:'ASIC #441230', status:'ok',  review:'15 Jul 2026', initials:'MC', color:'#9B59B6' },
+    { n:4,  name:'Nova FX LATAM',          country:'México',      flag:'🇲🇽', license:'CNBV — SUSPENDIDA', status:'bad', review:'18 Jul 2026', initials:'NF', color:'#FF4D4D' },
+    { n:5,  name:'Proxima Brokers SA',     country:'Argentina',   flag:'🇦🇷', license:'CNV #3042',   status:'ok',  review:'20 Jul 2026', initials:'PB', color:'#13CA60' },
+    { n:6,  name:'Pacific Investments Ltd.',country:'Singapur',   flag:'🇸🇬', license:'MAS #MS2022', status:'mid', review:'12 Jul 2026', initials:'PI', color:'#F5C518' },
+    { n:7,  name:'Zenith Global Markets',  country:'EE.UU.',      flag:'🇺🇸', license:'SEC #CRD 41239', status:'ok', review:'22 Jul 2026', initials:'ZG', color:'#13CA60' },
+    { n:8,  name:'Canary Wharf FX',        country:'Reino Unido', flag:'🇬🇧', license:'FCA #802944', status:'ok',  review:'19 Jul 2026', initials:'CW', color:'#4F7FFF' },
+    { n:9,  name:'Andes Trading Group',    country:'Colombia',    flag:'🇨🇴', license:'SFC #2023-042', status:'mid', review:'17 Jul 2026', initials:'AT', color:'#F5C518' },
+    { n:10, name:'Horizon Asset Mgmt.',    country:'Suiza',       flag:'🇨🇭', license:'FINMA #A01234', status:'ok', review:'24 Jul 2026', initials:'HA', color:'#13CA60' },
+  ];
+
+  const statusMap = {
+    ok:  { label: 'Validado',    icon: 'check_circle',  cls: 'ok' },
+    mid: { label: 'En revisión', icon: 'schedule',      cls: 'mid' },
+    bad: { label: 'Alerta',      icon: 'warning',       cls: 'bad' }
+  };
+
+  function renderTable(filter) {
+    const tbody = document.getElementById('broker-table-body');
+    const rows = filter === 'all' ? brokerData : brokerData.filter(b => b.status === filter);
+
+    tbody.innerHTML = rows.map(b => {
+      const s = statusMap[b.status];
+      return `
+        <tr>
+          <td style="color:var(--tc-gray-2); font-weight:700;">${b.n}</td>
+          <td>
+            <div class="broker-cell">
+              <div class="broker-avatar" style="background:${b.color}22; color:${b.color};">${b.initials}</div>
+              <div>
+                <div class="broker-name">${b.name}</div>
+                <div class="broker-id">${b.country} ${b.flag}</div>
+              </div>
+            </div>
+          </td>
+          <td style="color:var(--tc-gray);">${b.country}</td>
+          <td style="font-size:.78rem; font-family:monospace; color:var(--tc-gray);">${b.license}</td>
+          <td>
+            <span class="status-pill ${s.cls}">
+              <span class="material-icons">${s.icon}</span>
+              ${s.label}
+            </span>
+          </td>
+          <td style="color:var(--tc-gray); font-size:.78rem;">${b.review}</td>
+          <td>
+            <button class="action-btn" onclick="alert('Abriendo expediente de ${b.name}')">
+              <span class="material-icons">visibility</span> Ver
+            </button>
+          </td>
+        </tr>`;
+    }).join('');
+  }
+
+  renderTable('all');
+
+  function filterTable(filter, btn) {
+    document.querySelectorAll('.table-filters .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderTable(filter);
+  }
+
+  /* ── FEED DE ACTIVIDAD ── */
+  const activities = [
+    { type:'ok',   icon:'verified',           msg:'<strong>Zenith Global Markets</strong> completó auditoría con resultado <strong>Apto</strong>.', time:'Hace 15 min' },
+    { type:'bad',  icon:'block',              msg:'Acceso de <strong>Nova FX LATAM</strong> suspendido — licencia CNBV revocada.', time:'Hace 2 h' },
+    { type:'mid',  icon:'person_add',         msg:'Nuevo caso abierto — Inversor reportó fondos retenidos con <strong>EuroTrade Partners</strong>.', time:'Hace 3 h' },
+    { type:'info', icon:'description',        msg:'Informe mensual Q2-2026 generado y enviado al equipo regulatorio.', time:'Hace 5 h' },
+    { type:'ok',   icon:'task_alt',           msg:'Caso #TC-2026-118 cerrado. Resolución: mediación exitosa con <strong>Canary Wharf FX</strong>.', time:'Hace 6 h' },
+    { type:'mid',  icon:'schedule',           msg:'Revisión anual iniciada para <strong>Pacific Investments Ltd.</strong> — documentación solicitada.', time:'Hace 8 h' },
+    { type:'ok',   icon:'add_circle',         msg:'<strong>Andes Trading Group</strong> agregado al programa de auditoría — Track A iniciado.', time:'Hace 12 h' },
+    { type:'bad',  icon:'notifications_active', msg:'Alerta generada: 3 reportes de retiros bloqueados en <strong>EuroTrade Partners</strong>.', time:'Hace 14 h' },
+  ];
+
+  const feed = document.getElementById('activity-feed');
+  feed.innerHTML = activities.map(a => `
+    <div class="activity-item" role="article">
+      <div class="activity-icon ${a.type}">
+        <span class="material-icons">${a.icon}</span>
+      </div>
+      <div class="activity-body">
+        <p>${a.msg}</p>
+        <p class="activity-time">${a.time}</p>
+      </div>
+    </div>
+  `).join('');
+  </script>
+
+</body>
+</html>

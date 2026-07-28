@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TC Compliance Hub — Componentes Base</title>
+  <meta name="description" content="Navbar y Footer del portal de auditoría y compliance de Trading Central." />
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+
+  <style>
+    /* ============================================================
+       DESIGN SYSTEM — TC COMPLIANCE HUB
+       NUNCA modificar estas variables en páginas individuales
+    ============================================================ */
+    :root {
+      --tc-black:      #030030;
+      --tc-card:       #0A0A45;
+      --tc-green:      #13CA60;
+      --tc-green-h:    #0FA84E;
+      --tc-white:      #FFFFFF;
+      --tc-gray:       rgba(255,255,255,0.55);
+      --tc-border:     rgba(255,255,255,0.12);
+      --tc-input:      rgba(255,255,255,0.05);
+      --tc-error:      #FF4D4D;
+      --tc-warn:       #F5C518;
+      --tc-nav-h:      68px;
+      --tc-sidebar-w:  240px;
+      --tc-radius:     12px;
+      --tc-radius-sm:  8px;
+      --transition-c:  .18s ease;
+      --transition-t:  .25s ease;
+    }
+
+    /* ── Reset mínimo ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--tc-black);
+      background-image: radial-gradient(circle, rgba(19,202,96,.08) 1px, transparent 1px);
+      background-size: 28px 28px;
+      color: var(--tc-white);
+      min-height: 100vh;
+    }
+
+    /* ── Layout contenedor ── */
+    .tc-container {
+      max-width: 1200px;
+      padding: 0 24px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* ── Utilidades de texto ── */
+    .tc-label {
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--tc-green);
+    }
+
+    /* ── Badge de estado / urgencia ── */
+    .tc-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(19,202,96,.12);
+      border: 1px solid rgba(19,202,96,.30);
+      color: var(--tc-green);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    .tc-badge .pulse {
+      width: 6px; height: 6px;
+      background: var(--tc-green);
+      border-radius: 50%;
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: .45; transform: scale(1.4); }
+    }
+
+    /* ── Botón primario ── */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--tc-green);
+      color: var(--tc-black);
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: .8rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: none;
+      border-radius: var(--tc-radius-sm);
+      padding: 13px 28px;
+      cursor: pointer;
+      transition: background var(--transition-c),
+                  box-shadow var(--transition-c),
+                  transform var(--transition-t);
+    }
+    .btn-primary:hover {
+      background: var(--tc-green-h);
+      box-shadow: 0 4px 20px rgba(19,202,96,.35);
+      transform: translateY(-1px);
+    }
+
+    /* ── Botón outline ── */
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      color: var(--tc-white);
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: .8rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: 1.5px solid rgba(255,255,255,.25);
+      border-radius: var(--tc-radius-sm);
+      padding: 12px 28px;
+      cursor: pointer;
+      transition: border-color var(--transition-c),
+                  color var(--transition-c),
+                  transform var(--transition-t);
+    }
+    .btn-outline:hover {
+      border-color: var(--tc-green);
+      color: var(--tc-green);
+      transform: translateY(-1px);
+    }
+
+    /* ── Badges de estatus de compliance ── */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      border-radius: 20px;
+      padding: 3px 10px;
+    }
+    .status-badge.validated {
+      background: rgba(19,202,96,.12);
+      color: var(--tc-green);
+    }
+    .status-badge.reviewing {
+      background: rgba(245,197,24,.12);
+      color: var(--tc-warn);
+    }
+    .status-badge.alert {
+      background: rgba(255,77,77,.12);
+      color: var(--tc-error);
+    }
+
+    /* ── Cards ── */
+    .tc-card {
+      background: var(--tc-card);
+      border: 1px solid var(--tc-border);
+      border-radius: var(--tc-radius);
+      position: relative;
+      overflow: hidden;
+      transition: transform var(--transition-t),
+                  box-shadow var(--transition-t);
+    }
+    .tc-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg,
+        transparent 0%, var(--tc-green) 40%,
+        var(--tc-green) 60%, transparent 100%);
+    }
+    .tc-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(19,202,96,.12);
+    }
+
+    /* ── Inputs y selects ── */
+    .tc-input, .tc-select, .tc-textarea {
+      width: 100%;
+      background: var(--tc-input);
+      border: 1.5px solid var(--tc-border);
+      color: var(--tc-white);
+      border-radius: var(--tc-radius-sm);
+      padding: 13px 16px;
+      font-family: 'Inter', sans-serif;
+      font-size: .9rem;
+      outline: none;
+      transition: border-color var(--transition-c),
+                  box-shadow var(--transition-c);
+      appearance: none;
+    }
+    .tc-input:focus, .tc-select:focus, .tc-textarea:focus {
+      border-color: var(--tc-green);
+      box-shadow: 0 0 0 3px rgba(19,202,96,.15);
+    }
+    .tc-select option { background: var(--tc-card); color: var(--tc-white); }
+    .tc-textarea { resize: vertical; min-height: 120px; }
+
+    /* ── Fade-in scroll (IntersectionObserver) ── */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ============================================================
+       NAVBAR
+    ============================================================ */
+    .tc-nav {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      height: var(--tc-nav-h);
+      background: rgba(3,0,48,.96);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--tc-border);
+    }
+
+    .tc-nav__inner {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    /* Logo */
+    .tc-nav__logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .tc-nav__logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--tc-green) 0%, var(--tc-green-h) 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .tc-nav__logo-icon .material-icons {
+      font-size: 20px;
+      color: var(--tc-black);
+    }
+    .tc-nav__logo-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+    .tc-nav__logo-text strong {
+      font-size: .9rem;
+      font-weight: 800;
+      letter-spacing: .04em;
+      color: var(--tc-white);
+    }
+    .tc-nav__logo-text span {
+      font-size: .6rem;
+      font-weight: 500;
+      color: var(--tc-green);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    /* Links de navegación */
+    .tc-nav__links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      list-style: none;
+    }
+    .tc-nav__links a {
+      display: block;
+      padding: 6px 12px;
+      font-size: .83rem;
+      font-weight: 500;
+      color: var(--tc-gray);
+      text-decoration: none;
+      border-radius: 6px;
+      transition: color var(--transition-c), background var(--transition-c);
+      white-space: nowrap;
+    }
+    .tc-nav__links a:hover,
+    .tc-nav__links a.active {
+      color: var(--tc-white);
+      background: rgba(255,255,255,.06);
+    }
+    .tc-nav__links a.active {
+      color: var(--tc-green);
+    }
+
+    /* CTAs del navbar */
+    .tc-nav__ctas {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .tc-nav__ctas .btn-primary  { padding: 9px 18px; font-size: .75rem; }
+    .tc-nav__ctas .btn-outline  { padding: 8px 18px; font-size: .75rem; }
+
+    /* Hamburger button */
+    .tc-nav__hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 8px;
+      border: none;
+      background: transparent;
+    }
+    .tc-nav__hamburger span {
+      display: block;
+      width: 22px; height: 2px;
+      background: var(--tc-white);
+      border-radius: 2px;
+      transition: transform .25s ease, opacity .2s ease;
+    }
+    .tc-nav__hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .tc-nav__hamburger.open span:nth-child(2) { opacity: 0; }
+    .tc-nav__hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* Mobile overlay menu */
+    .tc-nav__mobile {
+      display: none;
+      position: fixed;
+      inset: var(--tc-nav-h) 0 0 0;
+      background: rgba(3,0,48,.98);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 199;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 40px 24px;
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: opacity .25s ease, transform .25s ease;
+    }
+    .tc-nav__mobile.open {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .tc-nav__mobile a {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--tc-gray);
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 280px;
+      text-align: center;
+      transition: color var(--transition-c), background var(--transition-c);
+    }
+    .tc-nav__mobile a:hover { color: var(--tc-white); background: rgba(255,255,255,.07); }
+    .tc-nav__mobile .mobile-divider {
+      width: 100%;
+      max-width: 280px;
+      height: 1px;
+      background: var(--tc-border);
+      margin: 8px 0;
+    }
+    .tc-nav__mobile .btn-primary,
+    .tc-nav__mobile .btn-outline {
+      width: 100%;
+      max-width: 280px;
+      justify-content: center;
+      margin-top: 4px;
+    }
+
+    /* ── Responsive navbar ── */
+    @media (max-width: 1024px) {
+      .tc-nav__links { gap: 0; }
+      .tc-nav__links a { padding: 6px 9px; font-size: .78rem; }
+    }
+    @media (max-width: 768px) {
+      .tc-nav__links,
+      .tc-nav__ctas { display: none; }
+      .tc-nav__hamburger { display: flex; }
+    }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    .tc-footer {
+      background: rgba(0,0,20,.8);
+      border-top: 1px solid rgba(255,255,255,.08);
+      padding: 48px 0 32px;
+      margin-top: auto;
+    }
+
+    .tc-footer__grid {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr 1fr 1fr;
+      gap: 40px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    /* Col 1 — Logo + descripción */
+    .tc-footer__brand { }
+    .tc-footer__logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      margin-bottom: 16px;
+    }
+    .tc-footer__logo-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--tc-green) 0%, var(--tc-green-h) 100%);
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .tc-footer__logo-icon .material-icons { font-size: 17px; color: var(--tc-black); }
+    .tc-footer__logo-text strong {
+      font-size: .85rem;
+      font-weight: 800;
+      color: var(--tc-white);
+    }
+    .tc-footer__desc {
+      font-size: .82rem;
+      color: var(--tc-gray);
+      line-height: 1.65;
+      margin-bottom: 20px;
+    }
+    .tc-footer__certs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tc-footer__cert {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--tc-gray);
+    }
+    .tc-footer__cert .material-icons { font-size: 12px; color: var(--tc-green); }
+
+    /* Cols 2-4 — Columnas de links */
+    .tc-footer__col h4 {
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--tc-green);
+      margin-bottom: 20px;
+    }
+    .tc-footer__col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .tc-footer__col ul li a {
+      font-size: .83rem;
+      color: var(--tc-gray);
+      text-decoration: none;
+      transition: color var(--transition-c);
+    }
+    .tc-footer__col ul li a:hover { color: var(--tc-white); }
+
+    /* Bottom bar */
+    .tc-footer__bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-top: 28px;
+      flex-wrap: wrap;
+    }
+    .tc-footer__copyright {
+      font-size: .77rem;
+      color: var(--tc-gray);
+    }
+    .tc-footer__legal {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .tc-footer__legal a {
+      font-size: .77rem;
+      color: var(--tc-gray);
+      text-decoration: none;
+      transition: color var(--transition-c);
+    }
+    .tc-footer__legal a:hover { color: var(--tc-white); }
+
+    /* ── Responsive footer ── */
+    @media (max-width: 900px) {
+      .tc-footer__grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+      }
+      .tc-footer__brand { grid-column: 1 / -1; }
+    }
+    @media (max-width: 480px) {
+      .tc-footer__grid { grid-template-columns: 1fr; }
+      .tc-footer__bottom {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+    }
+
+    /* ============================================================
+       DEMO PAGE — Solo para visualizar los componentes
+    ============================================================ */
+    .demo-body {
+      padding: 80px 0;
+      text-align: center;
+    }
+    .demo-body h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+    .demo-body p {
+      color: var(--tc-gray);
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       COMPONENTE 1 — NAVBAR
+       Copiar desde aquí hasta </nav> para cada página
+  ============================================================ -->
+  <nav class="tc-nav" id="main-nav" role="navigation" aria-label="Navegación principal">
+    <div class="tc-container tc-nav__inner">
+
+      <!-- Logo -->
+      <a href="index.html" class="tc-nav__logo" aria-label="TC Compliance Hub — Inicio">
+        <img src="logo_tradingcentral.png" alt="Trading Central Logo" style="height:32px; width:auto; object-fit:contain; border-radius:4px;">
+      </a>
+
+      <!-- Links de navegación (desktop) -->
+      <ul class="tc-nav__links" role="list">
+        <li><a href="index.html" class="active">Inicio</a></li>
+        <li><a href="framework.html">Marco Regulatorio</a></li>
+        <li><a href="broker-audit.html">Auditoría</a></li>
+        <li><a href="investor-cases.html">Casos</a></li>
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="contacto.html">Contacto</a></li>
+      </ul>
+
+      <!-- CTAs dobles (desktop) -->
+      <div class="tc-nav__ctas">
+        <a href="broker-audit.html" class="btn-primary" id="nav-cta-audit">
+          <span class="material-icons" style="font-size:16px;">shield</span>
+          Iniciar Auditoría
+        </a>
+        <a href="investor-cases.html" class="btn-outline" id="nav-cta-report">
+          Reportar Caso
+          <span class="material-icons" style="font-size:16px;">arrow_forward</span>
+        </a>
+      </div>
+
+      <!-- Hamburger (mobile) -->
+      <button
+        class="tc-nav__hamburger"
+        id="hamburger-btn"
+        aria-label="Abrir menú"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+    </div>
+  </nav>
+
+  <!-- Mobile overlay menu -->
+  <div class="tc-nav__mobile" id="mobile-menu" role="dialog" aria-label="Menú móvil">
+    <a href="index.html" id="mobile-link-home">Inicio</a>
+    <a href="framework.html" id="mobile-link-framework">Marco Regulatorio</a>
+    <a href="broker-audit.html" id="mobile-link-audit">Auditoría de Brokers</a>
+    <a href="investor-cases.html" id="mobile-link-cases">Casos de Inversores</a>
+    <a href="dashboard.html" id="mobile-link-dashboard">Dashboard</a>
+    <a href="regulaciones.html" id="mobile-link-regs">Regulaciones</a>
+    <a href="contacto.html" id="mobile-link-contact">Contacto</a>
+    <div class="mobile-divider" role="separator"></div>
+    <a href="broker-audit.html" class="btn-primary" id="mobile-cta-audit">
+      <span class="material-icons" style="font-size:16px;">shield</span>
+      Iniciar Auditoría
+    </a>
+    <a href="investor-cases.html" class="btn-outline" id="mobile-cta-report">
+      Reportar Caso
+    </a>
+  </div>
+  <!-- ============================================================
+       FIN COMPONENTE 1 — NAVBAR
+  ============================================================ -->
+
+
+  <!-- Contenido demo (reemplazar en cada página) -->
+  <main class="demo-body">
+    <div class="tc-container">
+      <p class="tc-label" style="margin-bottom:12px;">Sesión 0 — Componentes Base</p>
+      <h1>TC Compliance Hub</h1>
+      <p>Navbar + Footer listos para copiar en cada página</p>
+      <br />
+      <!-- Demo de badges -->
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:24px 0;">
+        <span class="tc-badge"><span class="pulse"></span> Compliance Activo · MIFID II · SEC · FCA</span>
+        <span class="status-badge validated"><span class="material-icons" style="font-size:13px;">check_circle</span> Validado</span>
+        <span class="status-badge reviewing"><span class="material-icons" style="font-size:13px;">schedule</span> En Revisión</span>
+        <span class="status-badge alert"><span class="material-icons" style="font-size:13px;">warning</span> Alerta</span>
+      </div>
+      <!-- Demo de botones -->
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:24px 0;">
+        <button class="btn-primary" id="demo-btn-primary">
+          <span class="material-icons" style="font-size:16px;">shield</span>
+          Iniciar Auditoría
+        </button>
+        <button class="btn-outline" id="demo-btn-outline">
+          Reportar Caso
+          <span class="material-icons" style="font-size:16px;">arrow_forward</span>
+        </button>
+      </div>
+      <!-- Demo de card -->
+      <div style="max-width:360px;margin:0 auto 40px;text-align:left;">
+        <div class="tc-card" style="padding:24px;">
+          <p class="tc-label" style="margin-bottom:8px;">Demo de card</p>
+          <p style="color:var(--tc-gray);font-size:.88rem;line-height:1.6;">
+            Cards con línea top verde degradada y efecto hover translateY.
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+
+  <!-- ============================================================
+       COMPONENTE 2 — FOOTER
+       Copiar desde aquí hasta </footer> para cada página
+  ============================================================ -->
+  <footer class="tc-footer" id="main-footer" role="contentinfo">
+    <div class="tc-container">
+
+      <div class="tc-footer__grid">
+
+        <!-- Columna 1 — Logo + descripción -->
+        <div class="tc-footer__brand">
+          <a href="index.html" class="tc-footer__logo" aria-label="TC Compliance Hub — Inicio">
+        <img src="logo_tradingcentral.png" alt="Trading Central Logo" style="height:32px; width:auto; object-fit:contain; border-radius:4px;">
+      </a>
+          <p class="tc-footer__desc">
+            El portal de auditoría y compliance de Trading Central. Verificamos, auditamos
+            y supervisamos cada broker antes de darle acceso a nuestros analytics — y
+            respaldamos a los inversores cuando algo falla.
+          </p>
+          <!-- Certificaciones -->
+          <div class="tc-footer__certs">
+            <span class="tc-footer__cert">
+              <span class="material-icons">verified</span> SEC
+            </span>
+            <span class="tc-footer__cert">
+              <span class="material-icons">verified</span> SFC
+            </span>
+            <span class="tc-footer__cert">
+              <span class="material-icons">verified</span> Anacofi
+            </span>
+            <span class="tc-footer__cert">
+              <span class="material-icons">security</span> ISO 27001
+            </span>
+          </div>
+        </div>
+
+        <!-- Columna 2 — Plataforma -->
+        <div class="tc-footer__col">
+          <h4>Plataforma</h4>
+          <ul role="list">
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="framework.html">Marco Regulatorio</a></li>
+            <li><a href="broker-audit.html">Auditoría de Brokers</a></li>
+            <li><a href="investor-cases.html">Casos de Inversores</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="proceso.html">Cómo Funciona</a></li>
+          </ul>
+        </div>
+
+        <!-- Columna 3 — Regulatorio -->
+        <div class="tc-footer__col">
+          <h4>Regulatorio</h4>
+          <ul role="list">
+            <li><a href="regulaciones.html">Estándares Internacionales</a></li>
+            <li><a href="regulaciones.html#mifid">MIFID II</a></li>
+            <li><a href="regulaciones.html#sec">SEC</a></li>
+            <li><a href="regulaciones.html#fca">FCA</a></li>
+            <li><a href="regulaciones.html#cnbv">CNBV</a></li>
+            <li><a href="regulaciones.html#asic">ASIC</a></li>
+          </ul>
+        </div>
+
+        <!-- Columna 4 — Legal -->
+        <div class="tc-footer__col">
+          <h4>Legal</h4>
+          <ul role="list">
+            <li><a href="privacidad.html">Política de Privacidad</a></li>
+            <li><a href="privacidad.html#terminos">Términos de Uso</a></li>
+            <li><a href="privacidad.html#gdpr">GDPR</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+          </ul>
+        </div>
+
+      </div><!-- /footer__grid -->
+
+      <!-- Bottom bar -->
+      <div class="tc-footer__bottom">
+        <p class="tc-footer__copyright">
+          © Trading Central 2026. TC Compliance Hub. Todos los derechos reservados.
+        </p>
+        <nav class="tc-footer__legal" aria-label="Links legales">
+          <a href="privacidad.html#iso">ISO 27001</a>
+          <a href="privacidad.html">Privacidad</a>
+          <a href="privacidad.html#terminos">Términos</a>
+        </nav>
+      </div>
+
+    </div>
+  </footer>
+  <!-- ============================================================
+       FIN COMPONENTE 2 — FOOTER
+  ============================================================ -->
+
+
+  <!-- ============================================================
+       JAVASCRIPT — Copiar en cada página
+  ============================================================ -->
+  <script>
+    /* ── Navbar: hamburger + mobile menu ── */
+    (function() {
+      const btn  = document.getElementById('hamburger-btn');
+      const menu = document.getElementById('mobile-menu');
+      if (!btn || !menu) return;
+
+      btn.addEventListener('click', () => {
+        const isOpen = menu.classList.toggle('open');
+        btn.classList.toggle('open', isOpen);
+        btn.setAttribute('aria-expanded', isOpen);
+        // Bloquea scroll del body mientras el menú está abierto
+        document.body.style.overflow = isOpen ? 'hidden' : '';
+      });
+
+      // Cerrar al hacer click en un link del menú móvil
+      menu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          menu.classList.remove('open');
+          btn.classList.remove('open');
+          btn.setAttribute('aria-expanded', 'false');
+          document.body.style.overflow = '';
+        });
+      });
+    })();
+
+    /* ── Marcar el link activo según la URL actual ── */
+    (function() {
+      const page = window.location.pathname.split('/').pop() || 'index.html';
+      document.querySelectorAll('.tc-nav__links a').forEach(link => {
+        const href = link.getAttribute('href');
+        if (href === page) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+    })();
+
+    /* ── IntersectionObserver: fade-in al hacer scroll ── */
+    (function() {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target); // Anima solo una vez
+            }
+          });
+        },
+        { threshold: 0.12 }
+      );
+      document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    })();
+
+    /* ── Contador animado (para secciones de estadísticas) ──
+       Uso: <span data-counter="847" data-suffix=""></span>
+       Llamar: animateCounters() después de que el elemento sea visible
+    ── */
+    function animateCounter(el) {
+      const target   = +el.dataset.counter;
+      const suffix   = el.dataset.suffix || '';
+      const duration = 1800; // ms
+      const start    = performance.now();
+
+      function step(now) {
+        const elapsed  = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        // Ease-out cubic
+        const eased    = 1 - Math.pow(1 - progress, 3);
+        const value    = Math.floor(eased * target);
+        el.textContent = value.toLocaleString('es-MX') + suffix;
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+
+    // Activar contadores cuando entren al viewport
+    (function() {
+      const counterEls = document.querySelectorAll('[data-counter]');
+      if (!counterEls.length) return;
+
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            animateCounter(e.target);
+            obs.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.5 });
+
+      counterEls.forEach(el => obs.observe(el));
+    })();
+  </script>
+
+</body>
+</html>

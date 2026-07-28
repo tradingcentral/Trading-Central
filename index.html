@@ -1,0 +1,2212 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TC Compliance Hub — l Estándar de Compliance Detrás de Cada Integración TC</title>
+  <meta name="description"
+    content="Trading Central verifica, audita y supervisa cada broker antes de darle acceso a sus analytics. Compliance regulatorio MIFID II, SEC, FCA, CNBV, ASIC y CySEC." />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="TC Compliance Hub — The Regulatory Standard Behind Every TC Integration" />
+  <meta property="og:description"
+    content="Trading Central verifica, audita y supervisa cada broker antes de darle acceso a sus analytics." />
+  <meta property="og:type" content="website" />
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+
+  <style>
+    /* ============================================================
+       DESIGN SYSTEM — TC COMPLIANCE HUB
+    ============================================================ */
+    :root {
+      --tc-black: #030030;
+      --tc-card: #0A0A45;
+      --tc-green: #13CA60;
+      --tc-green-h: #0FA84E;
+      --tc-white: #FFFFFF;
+      --tc-gray: rgba(255, 255, 255, 0.55);
+      --tc-border: rgba(255, 255, 255, 0.12);
+      --tc-input: rgba(255, 255, 255, 0.05);
+      --tc-error: #FF4D4D;
+      --tc-warn: #F5C518;
+      --tc-nav-h: 68px;
+      --tc-radius: 12px;
+      --tc-radius-sm: 8px;
+      --tc: .18s ease;
+      --tt: .25s ease;
+    }
+
+    /* ── Reset ── */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--tc-black);
+      background-image: radial-gradient(circle, rgba(19, 202, 96, .08) 1px, transparent 1px);
+      background-size: 28px 28px;
+      color: var(--tc-white);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Container ── */
+    .container {
+      max-width: 1200px;
+      padding: 0 24px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* ── Secciones ── */
+    section {
+      padding: 96px 0;
+    }
+
+    /* ── Fade-in scroll ── */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity .65s ease, transform .65s ease;
+    }
+
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .fade-in.delay-1 {
+      transition-delay: .1s;
+    }
+
+    .fade-in.delay-2 {
+      transition-delay: .2s;
+    }
+
+    .fade-in.delay-3 {
+      transition-delay: .3s;
+    }
+
+    .fade-in.delay-4 {
+      transition-delay: .4s;
+    }
+
+    .fade-in.delay-5 {
+      transition-delay: .5s;
+    }
+
+    /* ── Etiqueta de sección ── */
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--tc-green);
+      margin-bottom: 16px;
+    }
+
+    .section-label .material-icons {
+      font-size: 14px;
+    }
+
+    /* ── Badge de urgencia ── */
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(19, 202, 96, .1);
+      border: 1px solid rgba(19, 202, 96, .28);
+      color: var(--tc-green);
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .live-badge .pulse {
+      width: 7px;
+      height: 7px;
+      background: var(--tc-green);
+      border-radius: 50%;
+      flex-shrink: 0;
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(19, 202, 96, .5);
+      }
+
+      50% {
+        opacity: .6;
+        transform: scale(1.3);
+        box-shadow: 0 0 0 4px rgba(19, 202, 96, 0);
+      }
+    }
+
+    /* ── Botones ── */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--tc-green);
+      color: var(--tc-black);
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: .82rem;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: none;
+      border-radius: var(--tc-radius-sm);
+      padding: 14px 30px;
+      cursor: pointer;
+      transition: background var(--tc), box-shadow var(--tc), transform var(--tt);
+    }
+
+    .btn-primary:hover {
+      background: var(--tc-green-h);
+      box-shadow: 0 6px 24px rgba(19, 202, 96, .4);
+      transform: translateY(-2px);
+    }
+
+    .btn-primary .material-icons {
+      font-size: 17px;
+    }
+
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: transparent;
+      color: var(--tc-white);
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: .82rem;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: 1.5px solid rgba(255, 255, 255, .25);
+      border-radius: var(--tc-radius-sm);
+      padding: 13px 30px;
+      cursor: pointer;
+      transition: border-color var(--tc), color var(--tc), transform var(--tt);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--tc-green);
+      color: var(--tc-green);
+      transform: translateY(-2px);
+    }
+
+    .btn-outline .material-icons {
+      font-size: 17px;
+    }
+
+    /* ── Card base ── */
+    .tc-card {
+      background: var(--tc-card);
+      border: 1px solid var(--tc-border);
+      border-radius: var(--tc-radius);
+      position: relative;
+      overflow: hidden;
+      transition: transform var(--tt), box-shadow var(--tt);
+    }
+
+    .tc-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent 0%, var(--tc-green) 40%, var(--tc-green) 60%, transparent 100%);
+    }
+
+    .tc-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 16px 48px rgba(19, 202, 96, .14);
+    }
+
+    /* ── Status badges ── */
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      border-radius: 20px;
+      padding: 4px 11px;
+    }
+
+    .status.ok {
+      background: rgba(19, 202, 96, .12);
+      color: var(--tc-green);
+    }
+
+    .status.mid {
+      background: rgba(245, 197, 24, .12);
+      color: var(--tc-warn);
+    }
+
+    .status.bad {
+      background: rgba(255, 77, 77, .12);
+      color: var(--tc-error);
+    }
+
+    .status .material-icons {
+      font-size: 13px;
+    }
+
+    /* ============================================================
+       NAVBAR
+    ============================================================ */
+    .tc-nav {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      height: var(--tc-nav-h);
+      background: rgba(3, 0, 48, .96);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--tc-border);
+    }
+
+    .tc-nav__inner {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .tc-nav__logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .nav-logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--tc-green), var(--tc-green-h));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-logo-icon .material-icons {
+      font-size: 20px;
+      color: var(--tc-black);
+    }
+
+    .nav-logo-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+    }
+
+    .nav-logo-text strong {
+      font-size: .88rem;
+      font-weight: 800;
+      color: var(--tc-white);
+      letter-spacing: .01em;
+    }
+
+    .nav-logo-text span {
+      font-size: .58rem;
+      font-weight: 500;
+      color: var(--tc-green);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    .tc-nav__links {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      list-style: none;
+    }
+
+    .tc-nav__links a {
+      display: block;
+      padding: 6px 11px;
+      font-size: .82rem;
+      font-weight: 500;
+      color: var(--tc-gray);
+      text-decoration: none;
+      border-radius: 6px;
+      transition: color var(--tc), background var(--tc);
+    }
+
+    .tc-nav__links a:hover,
+    .tc-nav__links a.active {
+      color: var(--tc-white);
+      background: rgba(255, 255, 255, .06);
+    }
+
+    .tc-nav__links a.active {
+      color: var(--tc-green);
+    }
+
+    .tc-nav__ctas {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .tc-nav__ctas .btn-primary {
+      padding: 9px 18px;
+      font-size: .75rem;
+    }
+
+    .tc-nav__ctas .btn-outline {
+      padding: 8px 18px;
+      font-size: .75rem;
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 8px;
+      border: none;
+      background: transparent;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--tc-white);
+      border-radius: 2px;
+      transition: transform .25s ease, opacity .2s ease;
+    }
+
+    .hamburger.open span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+
+    .hamburger.open span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.open span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    .nav-mobile {
+      display: none;
+      position: fixed;
+      inset: var(--tc-nav-h) 0 0 0;
+      background: rgba(3, 0, 48, .98);
+      backdrop-filter: blur(20px);
+      z-index: 199;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 40px 24px;
+      opacity: 0;
+      transform: translateY(-6px);
+      transition: opacity .25s ease, transform .25s ease;
+    }
+
+    .nav-mobile.open {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .nav-mobile a {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--tc-gray);
+      text-decoration: none;
+      padding: 11px 24px;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 280px;
+      text-align: center;
+      transition: color var(--tc), background var(--tc);
+    }
+
+    .nav-mobile a:hover {
+      color: var(--tc-white);
+      background: rgba(255, 255, 255, .07);
+    }
+
+    .nav-mobile hr {
+      width: 100%;
+      max-width: 280px;
+      border: none;
+      border-top: 1px solid var(--tc-border);
+      margin: 6px 0;
+    }
+
+    .nav-mobile .btn-primary,
+    .nav-mobile .btn-outline {
+      width: 100%;
+      max-width: 280px;
+      justify-content: center;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 1050px) {
+      .tc-nav__links a {
+        padding: 6px 8px;
+        font-size: .78rem;
+      }
+    }
+
+    @media (max-width: 820px) {
+
+      .tc-nav__links,
+      .tc-nav__ctas {
+        display: none;
+      }
+
+      .hamburger {
+        display: flex;
+      }
+    }
+
+    /* ============================================================
+       SECCIÓN 2 — HERO
+    ============================================================ */
+    .hero {
+      min-height: calc(100vh - var(--tc-nav-h));
+      display: flex;
+      align-items: center;
+      padding: 80px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Glow de fondo */
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 600px;
+      background: radial-gradient(ellipse, rgba(19, 202, 96, .1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero__inner {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 60px;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero__badge {
+      margin-bottom: 24px;
+    }
+
+    .hero__title {
+      font-size: clamp(2.4rem, 5vw, 3.6rem);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -.02em;
+      margin-bottom: 24px;
+    }
+
+    .hero__title .accent {
+      color: var(--tc-green);
+    }
+
+    .hero__subtitle {
+      font-size: 1.05rem;
+      color: var(--tc-gray);
+      line-height: 1.7;
+      margin-bottom: 40px;
+      max-width: 540px;
+    }
+
+    .hero__ctas {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    /* Mini-card de compliance flotante */
+    .hero__visual {
+      position: relative;
+    }
+
+    .compliance-card {
+      background: var(--tc-card);
+      border: 1px solid var(--tc-border);
+      border-radius: 16px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .compliance-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--tc-green), transparent);
+    }
+
+    .compliance-card__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .compliance-card__header h3 {
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--tc-gray);
+    }
+
+    .compliance-card__header span {
+      font-size: .68rem;
+      font-weight: 600;
+      color: var(--tc-green);
+      background: rgba(19, 202, 96, .1);
+      border-radius: 20px;
+      padding: 2px 10px;
+    }
+
+    .compliance-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--tc-border);
+    }
+
+    .compliance-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .compliance-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .compliance-icon .material-icons {
+      font-size: 18px;
+    }
+
+    .compliance-item .ci-name {
+      font-weight: 600;
+      font-size: .88rem;
+    }
+
+    .compliance-item .ci-sub {
+      font-size: .73rem;
+      color: var(--tc-gray);
+      margin-top: 2px;
+    }
+
+    .compliance-item .status {
+      margin-left: auto;
+    }
+
+    /* Tarjeta flotante de métricas */
+    .hero__metric-card {
+      position: absolute;
+      bottom: -20px;
+      right: -24px;
+      background: var(--tc-card);
+      border: 1px solid var(--tc-border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
+      animation: float 4s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    .hero__metric-card .metric-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(19, 202, 96, .12);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero__metric-card .metric-icon .material-icons {
+      color: var(--tc-green);
+      font-size: 20px;
+    }
+
+    .hero__metric-card .metric-val {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--tc-green);
+      line-height: 1;
+    }
+
+    .hero__metric-card .metric-label {
+      font-size: .72rem;
+      color: var(--tc-gray);
+      margin-top: 2px;
+    }
+
+    @media (max-width: 900px) {
+      .hero__inner {
+        grid-template-columns: 1fr;
+        gap: 48px;
+      }
+
+      .hero__visual {
+        order: -1;
+        max-width: 480px;
+        margin: 0 auto;
+      }
+
+      .hero__metric-card {
+        right: 0;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero {
+        padding: 60px 0;
+      }
+
+      .hero__title {
+        font-size: 2rem;
+      }
+    }
+
+    /* ============================================================
+       SECCIÓN 3 — DOS TRACKS
+    ============================================================ */
+    .tracks {
+      background: rgba(10, 10, 69, .3);
+    }
+
+    .tracks__header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .tracks__header h2 {
+      font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .tracks__header p {
+      color: var(--tc-gray);
+      font-size: 1rem;
+    }
+
+    .tracks__grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+
+    .track-card {
+      background: var(--tc-card);
+      border: 1px solid var(--tc-border);
+      border-radius: 16px;
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+      transition: transform var(--tt), box-shadow var(--tt);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .track-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 24px 60px rgba(19, 202, 96, .12);
+    }
+
+    .track-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent 0%, var(--tc-green) 40%, var(--tc-green) 60%, transparent 100%);
+    }
+
+    /* Glow de fondo de la card */
+    .track-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(19, 202, 96, .06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .track-card__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--tc-green);
+      background: rgba(19, 202, 96, .1);
+      border: 1px solid rgba(19, 202, 96, .2);
+      border-radius: 20px;
+      padding: 4px 12px;
+      width: fit-content;
+    }
+
+    .track-card__icon {
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, rgba(19, 202, 96, .15), rgba(19, 202, 96, .05));
+      border: 1px solid rgba(19, 202, 96, .2);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .track-card__icon .material-icons {
+      font-size: 30px;
+      color: var(--tc-green);
+    }
+
+    .track-card h3 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .track-card p {
+      color: var(--tc-gray);
+      font-size: .93rem;
+      line-height: 1.7;
+    }
+
+    .track-card__features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .track-card__features li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: .88rem;
+      color: var(--tc-gray);
+    }
+
+    .track-card__features li .material-icons {
+      font-size: 16px;
+      color: var(--tc-green);
+      flex-shrink: 0;
+    }
+
+    .track-card .btn-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--tc-green);
+      font-weight: 700;
+      font-size: .82rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: gap var(--tc);
+      margin-top: auto;
+    }
+
+    .track-card .btn-link:hover {
+      gap: 10px;
+    }
+
+    .track-card .btn-link .material-icons {
+      font-size: 18px;
+    }
+
+    @media (max-width: 700px) {
+      .tracks__grid {
+        grid-template-columns: 1fr;
+      }
+
+      .track-card {
+        padding: 28px;
+      }
+    }
+
+    /* ============================================================
+       SECCIÓN 4 — ESTADÍSTICAS
+    ============================================================ */
+    .stats {
+      padding: 72px 0;
+    }
+
+    .stats__grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      background: var(--tc-border);
+      border: 1px solid var(--tc-border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .stat-item {
+      background: var(--tc-card);
+      padding: 40px 32px;
+      text-align: center;
+      transition: background var(--tc);
+    }
+
+    .stat-item:hover {
+      background: rgba(10, 10, 69, .9);
+    }
+
+    .stat-item__value {
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      font-weight: 900;
+      color: var(--tc-green);
+      line-height: 1;
+      margin-bottom: 8px;
+      letter-spacing: -.02em;
+    }
+
+    .stat-item__label {
+      font-size: .8rem;
+      font-weight: 500;
+      color: var(--tc-gray);
+      line-height: 1.4;
+    }
+
+    @media (max-width: 700px) {
+      .stats__grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .stats__grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ============================================================
+       SECCIÓN 5 — ESTÁNDARES REGULATORIOS
+    ============================================================ */
+    .standards__header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .standards__header h2 {
+      font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .standards__header p {
+      color: var(--tc-gray);
+    }
+
+    .standards__grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .std-card {
+      background: var(--tc-card);
+      border: 1px solid var(--tc-border);
+      border-radius: var(--tc-radius);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: transform var(--tt), box-shadow var(--tt), border-color var(--tc);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .std-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--tc-green), transparent);
+    }
+
+    .std-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 36px rgba(19, 202, 96, .1);
+      border-color: rgba(19, 202, 96, .25);
+    }
+
+    .std-card__top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .std-card__sigla {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--tc-green);
+      letter-spacing: -.01em;
+    }
+
+    .std-card__region {
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--tc-gray);
+      background: rgba(255, 255, 255, .05);
+      border: 1px solid rgba(255, 255, 255, .08);
+      border-radius: 6px;
+      padding: 3px 9px;
+    }
+
+    .std-card h4 {
+      font-size: .9rem;
+      font-weight: 700;
+    }
+
+    .std-card p {
+      font-size: .8rem;
+      color: var(--tc-gray);
+      line-height: 1.6;
+    }
+
+    .std-card__applied {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--tc-green);
+      margin-top: 4px;
+    }
+
+    .std-card__applied .material-icons {
+      font-size: 13px;
+    }
+
+    @media (max-width: 800px) {
+      .standards__grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .standards__grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ============================================================
+       SECCIÓN 6 — CÓMO FUNCIONA
+    ============================================================ */
+    .how {
+      background: rgba(10, 10, 69, .3);
+    }
+
+    .how__header {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+
+    .how__header h2 {
+      font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .how__header p {
+      color: var(--tc-gray);
+    }
+
+    .how__steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      position: relative;
+    }
+
+    /* Línea conectora */
+    .how__steps::before {
+      content: '';
+      position: absolute;
+      top: 40px;
+      left: calc(50% / 3);
+      right: calc(50% / 3);
+      height: 2px;
+      background: linear-gradient(90deg, var(--tc-green) 0%, rgba(19, 202, 96, .2) 50%, var(--tc-green) 100%);
+      background-size: 200% 100%;
+      animation: linePulse 3s ease infinite;
+    }
+
+    @keyframes linePulse {
+      0% {
+        background-position: 100% 0;
+      }
+
+      100% {
+        background-position: -100% 0;
+      }
+    }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 0 24px;
+    }
+
+    .step__num {
+      width: 80px;
+      height: 80px;
+      background: var(--tc-card);
+      border: 2px solid var(--tc-green);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 28px;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 0 0 6px rgba(19, 202, 96, .08);
+    }
+
+    .step__num .material-icons {
+      font-size: 32px;
+      color: var(--tc-green);
+    }
+
+    .step h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .step p {
+      font-size: .88rem;
+      color: var(--tc-gray);
+      line-height: 1.65;
+    }
+
+    @media (max-width: 700px) {
+      .how__steps {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .how__steps::before {
+        display: none;
+      }
+    }
+
+    /* ============================================================
+       SECCIÓN 7 — POR QUÉ TC
+    ============================================================ */
+    .why__header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+
+    .why__header h2 {
+      font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .why__header p {
+      color: var(--tc-gray);
+    }
+
+    .why__grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .why-item {
+      background: var(--tc-card);
+      border: 1px solid var(--tc-border);
+      border-radius: var(--tc-radius);
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: transform var(--tt), box-shadow var(--tt);
+    }
+
+    .why-item:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 48px rgba(19, 202, 96, .1);
+    }
+
+    .why-item__icon {
+      width: 48px;
+      height: 48px;
+      background: rgba(19, 202, 96, .1);
+      border: 1px solid rgba(19, 202, 96, .2);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .why-item__icon .material-icons {
+      font-size: 22px;
+      color: var(--tc-green);
+    }
+
+    .why-item h4 {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .why-item p {
+      font-size: .85rem;
+      color: var(--tc-gray);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 800px) {
+      .why__grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .why__grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ============================================================
+       SECCIÓN 8 — CTA BANNER FINAL
+    ============================================================ */
+    .cta-banner {
+      padding: 80px 0;
+      background: rgba(10, 10, 69, .3);
+    }
+
+    .cta-banner__inner {
+      background: var(--tc-card);
+      border: 1px solid var(--tc-border);
+      border-radius: 20px;
+      padding: 64px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Glow de fondo */
+    .cta-banner__inner::before {
+      content: '';
+      position: absolute;
+      top: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 400px;
+      background: radial-gradient(ellipse, rgba(19, 202, 96, .1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .cta-banner__inner::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--tc-green) 30%, var(--tc-green) 70%, transparent);
+    }
+
+    .cta-banner__tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--tc-green);
+      margin-bottom: 20px;
+    }
+
+    .cta-banner__tag .material-icons {
+      font-size: 15px;
+    }
+
+    .cta-banner h2 {
+      font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+      font-weight: 800;
+      margin-bottom: 14px;
+      line-height: 1.2;
+    }
+
+    .cta-banner p {
+      color: var(--tc-gray);
+      font-size: 1rem;
+      line-height: 1.65;
+      max-width: 560px;
+      margin: 0 auto 36px;
+    }
+
+    .cta-banner__btns {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .cta-banner__microcopy {
+      margin-top: 20px;
+      font-size: .75rem;
+      color: var(--tc-gray);
+    }
+
+    .cta-banner__microcopy .material-icons {
+      font-size: 13px;
+      vertical-align: middle;
+      color: var(--tc-green);
+    }
+
+    @media (max-width: 600px) {
+      .cta-banner__inner {
+        padding: 40px 24px;
+      }
+    }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    .tc-footer {
+      background: rgba(0, 0, 20, .8);
+      border-top: 1px solid rgba(255, 255, 255, .08);
+      padding: 56px 0 32px;
+    }
+
+    .tc-footer__grid {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr 1fr 1fr;
+      gap: 40px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid rgba(255, 255, 255, .08);
+    }
+
+    .tc-footer__logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      margin-bottom: 14px;
+    }
+
+    .footer-logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--tc-green), var(--tc-green-h));
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .footer-logo-icon .material-icons {
+      font-size: 17px;
+      color: var(--tc-black);
+    }
+
+    .footer-logo-text strong {
+      font-size: .85rem;
+      font-weight: 800;
+      color: var(--tc-white);
+      display: block;
+    }
+
+    .footer-logo-text span {
+      font-size: .58rem;
+      color: var(--tc-green);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .tc-footer__desc {
+      font-size: .82rem;
+      color: var(--tc-gray);
+      line-height: 1.65;
+      margin-bottom: 20px;
+    }
+
+    .footer-certs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .footer-cert {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(255, 255, 255, .05);
+      border: 1px solid rgba(255, 255, 255, .1);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: .63rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--tc-gray);
+    }
+
+    .footer-cert .material-icons {
+      font-size: 11px;
+      color: var(--tc-green);
+    }
+
+    .tc-footer__col h4 {
+      font-size: .68rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--tc-green);
+      margin-bottom: 18px;
+    }
+
+    .tc-footer__col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .tc-footer__col ul li a {
+      font-size: .82rem;
+      color: var(--tc-gray);
+      text-decoration: none;
+      transition: color var(--tc);
+    }
+
+    .tc-footer__col ul li a:hover {
+      color: var(--tc-white);
+    }
+
+    .tc-footer__bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-top: 28px;
+      flex-wrap: wrap;
+    }
+
+    .tc-footer__copyright {
+      font-size: .76rem;
+      color: var(--tc-gray);
+    }
+
+    .tc-footer__legal {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .tc-footer__legal a {
+      font-size: .76rem;
+      color: var(--tc-gray);
+      text-decoration: none;
+      transition: color var(--tc);
+    }
+
+    .tc-footer__legal a:hover {
+      color: var(--tc-white);
+    }
+
+    @media (max-width: 900px) {
+      .tc-footer__grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+      }
+
+      .tc-footer__grid>div:first-child {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .tc-footer__grid {
+        grid-template-columns: 1fr;
+      }
+
+      .tc-footer__bottom {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ============================================================
+       NAVBAR
+  ============================================================ -->
+  <nav class="tc-nav" role="navigation" aria-label="Navegación principal">
+    <div class="container tc-nav__inner">
+      <a href="index.html" class="tc-nav__logo" aria-label="TC Compliance Hub — Inicio">
+        <img src="logo_tradingcentral.png" alt="Trading Central Logo" style="height:32px; width:auto; object-fit:contain; border-radius:4px;">
+        <div class="nav-logo-text"><strong>Trading Central</strong><span>central regulatoria</span></div>
+      </a>
+
+      <ul class="tc-nav__links" role="list">
+        <li><a href="index.html" class="active">Inicio</a></li>
+        <li><a href="framework.html">Marco Regulatorio</a></li>
+        <li><a href="broker-audit.html">Auditoría</a></li>
+        <li><a href="investor-cases.html">Casos</a></li>
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="contacto.html">Contacto</a></li>
+      </ul>
+
+      <div class="tc-nav__ctas">
+        <a href="broker-audit.html" class="btn-primary" id="nav-cta-audit">
+          <span class="material-icons">shield</span>
+          Iniciar Auditoría
+        </a>
+        <a href="investor-cases.html" class="btn-outline" id="nav-cta-report">
+          Reportar Caso
+          <span class="material-icons">arrow_forward</span>
+        </a>
+      </div>
+
+      <button class="hamburger" id="hamburger-btn" aria-label="Abrir menú" aria-expanded="false"
+        aria-controls="mobile-menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile menu -->
+  <div class="nav-mobile" id="mobile-menu" role="dialog" aria-label="Menú móvil">
+    <a href="index.html">Inicio</a>
+    <a href="framework.html">Marco Regulatorio</a>
+    <a href="broker-audit.html">Auditoría de Brokers</a>
+    <a href="investor-cases.html">Casos de Inversores</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="regulaciones.html">Regulaciones</a>
+    <a href="contacto.html">Contacto</a>
+    <hr />
+    <a href="broker-audit.html" class="btn-primary" id="mob-audit">
+      <span class="material-icons">shield</span> Iniciar Auditoría
+    </a>
+    <a href="investor-cases.html" class="btn-outline" id="mob-report">Reportar Caso</a>
+  </div>
+
+
+  <!-- ============================================================
+       SECCIÓN 2 — HERO
+  ============================================================ -->
+  <section class="hero" id="hero" aria-labelledby="hero-title">
+    <div class="container hero__inner">
+
+      <!-- Columna izquierda -->
+      <div class="hero__content">
+        <div class="hero__badge">
+          <span class="live-badge">
+            <span class="pulse" aria-hidden="true"></span>
+            Compliance Activo &nbsp;·&nbsp; MIFID II &nbsp;·&nbsp; SEC &nbsp;·&nbsp; FCA
+          </span>
+        </div>
+
+        <h1 class="hero__title" id="hero-title">
+          El Estándar de Compliance
+          <span class="accent">Detrás de Cada<br>Integración TC</span>
+        </h1>
+
+        <p class="hero__subtitle">
+          Trading Central verifica, audita y supervisa cada broker antes de darle
+          acceso a nuestros analytics. Y respaldamos a los inversores cuando algo falla.
+        </p>
+
+        <div class="hero__ctas">
+          <a href="broker-audit.html" class="btn-primary" id="hero-cta-audit">
+            <span class="material-icons">shield</span>
+            Iniciar Auditoría de Broker
+          </a>
+          <a href="investor-cases.html" class="btn-outline" id="hero-cta-report">
+            Reportar Irregularidad
+            <span class="material-icons">arrow_forward</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Mini-card de compliance -->
+      <div class="hero__visual" role="img" aria-label="Panel de estatus de compliance de brokers">
+        <div class="compliance-card">
+          <div class="compliance-card__header">
+            <h3>Estatus de Compliance</h3>
+            <span>Tiempo real</span>
+          </div>
+
+          <div class="compliance-item">
+            <div class="compliance-icon" style="background:rgba(19,202,96,.1);">
+              <span class="material-icons" style="color:var(--tc-green);">verified</span>
+            </div>
+            <div>
+              <div class="ci-name">Broker Alpha Markets</div>
+              <div class="ci-sub">FCA · Reino Unido</div>
+            </div>
+            <span class="status ok">
+              <span class="material-icons">check_circle</span> Validado
+            </span>
+          </div>
+
+          <div class="compliance-item">
+            <div class="compliance-icon" style="background:rgba(245,197,24,.1);">
+              <span class="material-icons" style="color:var(--tc-warn);">schedule</span>
+            </div>
+            <div>
+              <div class="ci-name">Broker Nova FX</div>
+              <div class="ci-sub">CNBV · México</div>
+            </div>
+            <span class="status mid">
+              <span class="material-icons">schedule</span> En auditoría
+            </span>
+          </div>
+
+          <div class="compliance-item">
+            <div class="compliance-icon" style="background:rgba(255,77,77,.1);">
+              <span class="material-icons" style="color:var(--tc-error);">block</span>
+            </div>
+            <div>
+              <div class="ci-name">Broker Pacific Inv.</div>
+              <div class="ci-sub">Sin licencia verificada</div>
+            </div>
+            <span class="status bad">
+              <span class="material-icons">cancel</span> No apto
+            </span>
+          </div>
+        </div>
+
+        <!-- Tarjeta flotante de métricas -->
+        <div class="hero__metric-card" aria-hidden="true">
+          <div class="metric-icon">
+            <span class="material-icons">trending_up</span>
+          </div>
+          <div>
+            <div class="metric-val" data-counter="847" data-suffix="">0</div>
+            <div class="metric-label">Brokers auditados</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       SECCIÓN 3 — DOS TRACKS
+  ============================================================ -->
+  <section class="tracks" id="tracks" aria-labelledby="tracks-title">
+    <div class="container">
+      <div class="tracks__header fade-in">
+        <p class="section-label">
+          <span class="material-icons">fork_right</span>
+          Dos tracks, un estándar
+        </p>
+        <h2 id="tracks-title">¿Cómo podemos ayudarte?</h2>
+        <p>Selecciona el track que corresponde a tu situación.</p>
+      </div>
+
+      <div class="tracks__grid">
+        <!-- Track A -->
+        <div class="track-card fade-in delay-1">
+          <span class="track-card__badge">
+            <span class="material-icons" style="font-size:11px;">circle</span>
+            Track A · Para Brokers
+          </span>
+          <div class="track-card__icon">
+            <span class="material-icons">verified_user</span>
+          </div>
+          <div>
+            <h3>Para Brokers</h3>
+            <p>Obtén la validación TC antes de integrar nuestras herramientas.
+              Auditamos tu estructura regulatoria, licencias y cumplimiento
+              con los estándares internacionales.</p>
+          </div>
+          <ul class="track-card__features">
+            <li><span class="material-icons">check_circle</span> Verificación de licencias regulatorias</li>
+            <li><span class="material-icons">check_circle</span> Revisión de estructura corporativa</li>
+            <li><span class="material-icons">check_circle</span> Análisis de segregación de fondos</li>
+            <li><span class="material-icons">check_circle</span> Badge "Validado TC" para tu plataforma</li>
+          </ul>
+          <a href="broker-audit.html" class="btn-link" id="track-a-cta">
+            Ver proceso de auditoría <span class="material-icons">arrow_forward</span>
+          </a>
+        </div>
+
+        <!-- Track B -->
+        <div class="track-card fade-in delay-2">
+          <span class="track-card__badge">
+            <span class="material-icons" style="font-size:11px;">circle</span>
+            Track B · Para Inversores
+          </span>
+          <div class="track-card__icon">
+            <span class="material-icons">support_agent</span>
+          </div>
+          <div>
+            <h3>Para Inversores</h3>
+            <p>Si sufriste irregularidades con un broker que usa herramientas TC,
+              tenemos un canal dedicado de reporte y seguimiento de casos.
+              Analizamos cada situación con rigor y seriedad.</p>
+          </div>
+          <ul class="track-card__features">
+            <li><span class="material-icons">check_circle</span> Canal oficial de reporte de casos</li>
+            <li><span class="material-icons">check_circle</span> Verificación de relación broker-TC</li>
+            <li><span class="material-icons">check_circle</span> Investigación y mediación técnica</li>
+            <li><span class="material-icons">check_circle</span> Escalada regulatoria cuando aplica</li>
+          </ul>
+          <a href="investor-cases.html" class="btn-link" id="track-b-cta">
+            Reportar mi caso <span class="material-icons">arrow_forward</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       SECCIÓN 4 — ESTADÍSTICAS
+  ============================================================ -->
+  <section class="stats" aria-label="Estadísticas de TC Compliance Hub">
+    <div class="container">
+      <div class="stats__grid">
+        <div class="stat-item fade-in delay-1">
+          <div class="stat-item__value">
+            <span data-counter="847" data-suffix="">0</span>
+          </div>
+          <div class="stat-item__label">Brokers auditados<br>globalmente</div>
+        </div>
+        <div class="stat-item fade-in delay-2">
+          <div class="stat-item__value">
+            <span data-counter="32" data-suffix="">0</span>
+          </div>
+          <div class="stat-item__label">Países con cobertura<br>regulatoria</div>
+        </div>
+        <div class="stat-item fade-in delay-3">
+          <div class="stat-item__value">
+            <span data-counter="992" data-suffix="%">0%</span>
+          </div>
+          <div class="stat-item__label">Tasa de detección<br>temprana</div>
+        </div>
+        <div class="stat-item fade-in delay-4">
+          <div class="stat-item__value">
+            <span data-counter="23" data-suffix="M+">0</span>
+          </div>
+          <div class="stat-item__label">Inversores protegidos<br>en todo el mundo</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       SECCIÓN 5 — ESTÁNDARES REGULATORIOS
+  ============================================================ -->
+  <section id="standards" aria-labelledby="standards-title">
+    <div class="container">
+      <div class="standards__header fade-in">
+        <p class="section-label">
+          <span class="material-icons">public</span>
+          Cobertura global
+        </p>
+        <h2 id="standards-title">Estándares que Aplicamos</h2>
+        <p>TC valida brokers bajo los marcos regulatorios más exigentes del mundo.</p>
+      </div>
+
+      <div class="standards__grid">
+        <div class="std-card fade-in delay-1">
+          <div class="std-card__top">
+            <span class="std-card__sigla">MIFID II</span>
+            <span class="std-card__region">Europa · UE</span>
+          </div>
+          <h4>Markets in Financial Instruments Directive</h4>
+          <p>Exige segregación de fondos, transparencia de costos y protección al inversor minorista. Entidad: ESMA.</p>
+          <span class="std-card__applied"><span class="material-icons">verified</span> Aplicado por TC</span>
+        </div>
+
+        <div class="std-card fade-in delay-2">
+          <div class="std-card__top">
+            <span class="std-card__sigla">SEC</span>
+            <span class="std-card__region">EE.UU.</span>
+          </div>
+          <h4>Securities and Exchange Commission</h4>
+          <p>Regulación federal de valores en Estados Unidos. Supervisión de brokers y protección a inversores.</p>
+          <span class="std-card__applied"><span class="material-icons">verified</span> Aplicado por TC</span>
+        </div>
+
+        <div class="std-card fade-in delay-3">
+          <div class="std-card__top">
+            <span class="std-card__sigla">FCA</span>
+            <span class="std-card__region">Reino Unido</span>
+          </div>
+          <h4>Financial Conduct Authority</h4>
+          <p>Autoridad reguladora de servicios financieros del Reino Unido. Estándares de conducta y solvencia.</p>
+          <span class="std-card__applied"><span class="material-icons">verified</span> Aplicado por TC</span>
+        </div>
+
+        <div class="std-card fade-in delay-1">
+          <div class="std-card__top">
+            <span class="std-card__sigla">CNBV</span>
+            <span class="std-card__region">México</span>
+          </div>
+          <h4>Comisión Nacional Bancaria y de Valores</h4>
+          <p>Supervisión del sistema financiero mexicano. Licencias de intermediación bursátil y bancaria.</p>
+          <span class="std-card__applied"><span class="material-icons">verified</span> Aplicado por TC</span>
+        </div>
+
+        <div class="std-card fade-in delay-2">
+          <div class="std-card__top">
+            <span class="std-card__sigla">ASIC</span>
+            <span class="std-card__region">Australia</span>
+          </div>
+          <h4>Australian Securities and Investments Commission</h4>
+          <p>Regula servicios financieros y de valores en Australia. Enfoque en solvencia y protección al consumidor.
+          </p>
+          <span class="std-card__applied"><span class="material-icons">verified</span> Aplicado por TC</span>
+        </div>
+
+        <div class="std-card fade-in delay-3">
+          <div class="std-card__top">
+            <span class="std-card__sigla">CySEC</span>
+            <span class="std-card__region">Chipre · UE</span>
+          </div>
+          <h4>Cyprus Securities and Exchange Commission</h4>
+          <p>Regulación de servicios de inversión en Chipre. Acceso al pasaporte europeo bajo MIFID II.</p>
+          <span class="std-card__applied"><span class="material-icons">verified</span> Aplicado por TC</span>
+        </div>
+      </div>
+
+      <div style="text-align:center; margin-top:40px;">
+        <a href="regulaciones.html" class="btn-outline" id="see-all-regs">
+          Ver todos los estándares
+          <span class="material-icons">arrow_forward</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       SECCIÓN 6 — CÓMO FUNCIONA
+  ============================================================ -->
+  <section class="how" id="how" aria-labelledby="how-title">
+    <div class="container">
+      <div class="how__header fade-in">
+        <p class="section-label">
+          <span class="material-icons">timeline</span>
+          Proceso claro
+        </p>
+        <h2 id="how-title">Cómo Funciona</h2>
+        <p>Un proceso estructurado para brokers e inversores por igual.</p>
+      </div>
+
+      <div class="how__steps">
+        <div class="step fade-in delay-1">
+          <div class="step__num">
+            <span class="material-icons">send</span>
+          </div>
+          <h3>Solicitud</h3>
+          <p>El broker inicia su proceso de auditoría enviando su documentación regulatoria,
+            o el inversor reporta un caso con evidencia.</p>
+        </div>
+
+        <div class="step fade-in delay-2">
+          <div class="step__num">
+            <span class="material-icons">manage_search</span>
+          </div>
+          <h3>Auditoría / Análisis</h3>
+          <p>El equipo TC revisa licencias, estructura corporativa, cumplimiento normativo
+            y protocolos de seguridad. Proceso 100% confidencial.</p>
+        </div>
+
+        <div class="step fade-in delay-3">
+          <div class="step__num">
+            <span class="material-icons">task_alt</span>
+          </div>
+          <h3>Resolución</h3>
+          <p>Certificación para brokers aptos con badge TC, o gestión activa del caso
+            del inversor con escalada regulatoria si corresponde.</p>
+        </div>
+      </div>
+
+      <div style="text-align:center; margin-top:56px;">
+        <a href="proceso.html" class="btn-outline" id="see-process">
+          Ver proceso completo
+          <span class="material-icons">arrow_forward</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       SECCIÓN 7 — POR QUÉ TC
+  ============================================================ -->
+  <section id="why-tc" aria-labelledby="why-title">
+    <div class="container">
+      <div class="why__header fade-in">
+        <p class="section-label">
+          <span class="material-icons">workspace_premium</span>
+          27 años de expertise
+        </p>
+        <h2 id="why-title">Por Qué TC Compliance Hub</h2>
+        <p>El respaldo institucional que ningún otro portal puede ofrecer.</p>
+      </div>
+
+      <div class="why__grid">
+        <div class="why-item fade-in delay-1">
+          <div class="why-item__icon">
+            <span class="material-icons">history_edu</span>
+          </div>
+          <h4>25+ Años en Mercados Financieros</h4>
+          <p>Fundado en 1999, Trading Central es pionero en analytics financiero con presencia en los principales
+            mercados globales.</p>
+        </div>
+
+        <div class="why-item fade-in delay-2">
+          <div class="why-item__icon">
+            <span class="material-icons">gavel</span>
+          </div>
+          <h4>Registrado ante SEC, SFC y Anacofi</h4>
+          <p>Supervisado por las principales autoridades regulatorias de Estados Unidos, Hong Kong y Francia.</p>
+        </div>
+
+        <div class="why-item fade-in delay-3">
+          <div class="why-item__icon">
+            <span class="material-icons">security</span>
+          </div>
+          <h4>ISO/IEC 27001:2022 Certificado</h4>
+          <p>Gestión de seguridad de la información certificada bajo el estándar internacional más exigente.</p>
+        </div>
+
+        <div class="why-item fade-in delay-1">
+          <div class="why-item__icon">
+            <span class="material-icons">location_on</span>
+          </div>
+          <h4>Analistas en 6 Ciudades Globales</h4>
+          <p>Equipos en París, Ottawa, Hong Kong, Bucarest, Shanghái y Limassol para cobertura regional experta.</p>
+        </div>
+
+        <div class="why-item fade-in delay-2">
+          <div class="why-item__icon">
+            <span class="material-icons">schedule</span>
+          </div>
+          <h4>Cobertura 24/5 de Mercados</h4>
+          <p>Supervisión continua durante todas las sesiones de mercado globales, de lunes a viernes.</p>
+        </div>
+
+        <div class="why-item fade-in delay-3">
+          <div class="why-item__icon">
+            <span class="material-icons">lock</span>
+          </div>
+          <h4>Confidencialidad Absoluta</h4>
+          <p>Todos los procesos de auditoría y casos de inversores se gestionan bajo estrictos protocolos de privacidad.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       SECCIÓN 8 — CTA BANNER FINAL
+  ============================================================ -->
+  <section class="cta-banner" aria-labelledby="cta-title">
+    <div class="container">
+      <div class="cta-banner__inner fade-in">
+        <p class="cta-banner__tag">
+          <span class="material-icons">rocket_launch</span>
+          ¿Listo para comenzar?
+        </p>
+        <h2 id="cta-title">¿Eres un Broker Buscando<br>Integrarte con TC?</h2>
+        <p>
+          Inicia el proceso de auditoría y obtén tu validación TC. Acceso completo
+          a nuestros analytics, badge de validación y monitoreo continuo incluido.
+        </p>
+        <div class="cta-banner__btns">
+          <a href="broker-audit.html" class="btn-primary" id="cta-final-audit">
+            <span class="material-icons">shield</span>
+            Iniciar Auditoría
+          </a>
+          <a href="contacto.html" class="btn-outline" id="cta-final-contact">
+            Hablar con un especialista
+            <span class="material-icons">arrow_forward</span>
+          </a>
+        </div>
+        <p class="cta-banner__microcopy">
+          <span class="material-icons">lock</span> Confidencial &nbsp;·&nbsp;
+          <span class="material-icons">schedule</span> Respuesta en 48h &nbsp;·&nbsp;
+          <span class="material-icons">payments</span> Sin costo inicial
+        </p>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       SECCIÓN 9 — FOOTER
+  ============================================================ -->
+  <footer class="tc-footer" role="contentinfo">
+    <div class="container">
+      <div class="tc-footer__grid">
+
+        <!-- Col 1 — Marca -->
+        <div>
+          <a href="index.html" class="tc-footer__logo">
+        <img src="logo_tradingcentral.png" alt="Trading Central Logo" style="height:32px; width:auto; object-fit:contain; border-radius:4px;">
+      </a>
+          <p class="tc-footer__desc">
+            El portal de auditoría y compliance de Trading Central. Verificamos,
+            auditamos y supervisamos cada broker antes de darle acceso a nuestros analytics —
+            y respaldamos a los inversores cuando algo falla.
+          </p>
+          <div class="footer-certs">
+            <span class="footer-cert"><span class="material-icons">verified</span> SEC</span>
+            <span class="footer-cert"><span class="material-icons">verified</span> SFC</span>
+            <span class="footer-cert"><span class="material-icons">verified</span> Anacofi</span>
+            <span class="footer-cert"><span class="material-icons">security</span> ISO 27001</span>
+          </div>
+        </div>
+
+        <!-- Col 2 — Plataforma -->
+        <div class="tc-footer__col">
+          <h4>Plataforma</h4>
+          <ul>
+            <li><a href="index.html">Inicio</a></li>
+            <li><a href="framework.html">Marco Regulatorio</a></li>
+            <li><a href="broker-audit.html">Auditoría de Brokers</a></li>
+            <li><a href="investor-cases.html">Casos de Inversores</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="proceso.html">Cómo Funciona</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3 — Regulatorio -->
+        <div class="tc-footer__col">
+          <h4>Regulatorio</h4>
+          <ul>
+            <li><a href="regulaciones.html">Estándares Internacionales</a></li>
+            <li><a href="regulaciones.html#mifid">MIFID II</a></li>
+            <li><a href="regulaciones.html#sec">SEC</a></li>
+            <li><a href="regulaciones.html#fca">FCA</a></li>
+            <li><a href="regulaciones.html#cnbv">CNBV</a></li>
+            <li><a href="regulaciones.html#asic">ASIC</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 4 — Legal -->
+        <div class="tc-footer__col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="privacidad.html">Política de Privacidad</a></li>
+            <li><a href="privacidad.html#terminos">Términos de Uso</a></li>
+            <li><a href="privacidad.html#gdpr">GDPR</a></li>
+            <li><a href="contacto.html">Contacto</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="tc-footer__bottom">
+        <p class="tc-footer__copyright">
+          © Trading Central 2026. TC Compliance Hub. Todos los derechos reservados.
+        </p>
+        <nav class="tc-footer__legal" aria-label="Links legales">
+          <a href="privacidad.html#iso">ISO 27001</a>
+          <a href="privacidad.html">Privacidad</a>
+          <a href="privacidad.html#terminos">Términos</a>
+        </nav>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- ============================================================
+       JAVASCRIPT
+  ============================================================ -->
+  <script>
+    /* ── Hamburger / Mobile menu ── */
+    (function () {
+      const btn = document.getElementById('hamburger-btn');
+      const menu = document.getElementById('mobile-menu');
+      if (!btn || !menu) return;
+
+      btn.addEventListener('click', () => {
+        const open = menu.classList.toggle('open');
+        btn.classList.toggle('open', open);
+        btn.setAttribute('aria-expanded', open);
+        document.body.style.overflow = open ? 'hidden' : '';
+      });
+
+      menu.querySelectorAll('a').forEach(a => {
+        a.addEventListener('click', () => {
+          menu.classList.remove('open');
+          btn.classList.remove('open');
+          btn.setAttribute('aria-expanded', 'false');
+          document.body.style.overflow = '';
+        });
+      });
+    })();
+
+    /* ── IntersectionObserver: fade-in ── */
+    (function () {
+      const io = new IntersectionObserver(
+        entries => entries.forEach(e => {
+          if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+        }),
+        { threshold: 0.1 }
+      );
+      document.querySelectorAll('.fade-in').forEach(el => io.observe(el));
+    })();
+
+    /* ── Contadores animados ──
+       Formato especial: 992 → muestra "99.2%"
+    ── */
+    function animateCounter(el) {
+      const raw = +el.dataset.counter;
+      const suffix = el.dataset.suffix || '';
+      const dur = 2000;
+      const start = performance.now();
+
+      requestAnimationFrame(function step(now) {
+        const pct = Math.min((now - start) / dur, 1);
+        const eased = 1 - Math.pow(1 - pct, 3);
+        let val = Math.floor(eased * raw);
+
+        // Caso especial: 992 → "99.2%"
+        if (el.dataset.counter === '992') {
+          const pctVal = (eased * 99.2).toFixed(1);
+          el.textContent = pctVal + '%';
+        } else {
+          el.textContent = val.toLocaleString('es-MX') + suffix;
+        }
+
+        if (pct < 1) requestAnimationFrame(step);
+      });
+    }
+
+    (function () {
+      const els = document.querySelectorAll('[data-counter]');
+      if (!els.length) return;
+
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            animateCounter(e.target);
+            io.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.5 });
+
+      els.forEach(el => io.observe(el));
+    })();
+
+    /* ── Marcar link activo ── */
+    (function () {
+      const page = window.location.pathname.split('/').pop() || 'index.html';
+      document.querySelectorAll('.tc-nav__links a').forEach(a => {
+        a.classList.toggle('active', a.getAttribute('href') === page);
+      });
+    })();
+  </script>
+
+</body>
+
+</html>
